@@ -1,4 +1,4 @@
-require('modules');
+require('core');
 const weather = require('weather-js');
 const { JSDOM } = require('jsdom');
 

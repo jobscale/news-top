@@ -11,7 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "jsdom": "^15.1.0",
-    "modules": "github:jobscale/core",
+    "core": "github:jobscale/core",
     "weather-js": "^2.0.0"
   }
 }
