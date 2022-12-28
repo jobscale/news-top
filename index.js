@@ -1,40 +1,49 @@
-require('core');
-const weather = require('weather-js');
-const { JSDOM } = require('jsdom');
+const { logger } = require('@jobscale/logger');
+const { fetch } = require('@jobscale/fetch');
+const { kabuka } = require('./app');
 
-class Weather {
-  run() {
-    const url = 'https://tenki.jp/forecast/6/30/6200/27100/';
-    return fetch(url)
-    .then(res => res.text())
-    .then(body => new JSDOM(body).window.document)
-    .then(document => {
-      const el = document.querySelector('.today-weather');
-      const today = {
-        telop: el.querySelector('.weather-telop').textContent,
-        date: el.querySelector('.left-style').textContent,
-      };
-      const caption = `${today.telop} ${today.date}`;
-      return {
-        body: el.innerHTML,
-        caption,
-        image: el.querySelector('img').src,
-      };
-    });
+const list = [
+  '8316.T', '2497.T', '6143.T',
+];
+
+class App {
+  postSlack(data) {
+    const url = 'https://tanpo.jsx.jp/api/slack';
+    const options = {
+      url,
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data,
+    };
+    return fetch(options);
   }
-  find(search) {
-    const promise = promiseGen();
-    weather.find({ search, degreeType: 'C' }, (e, res) => {
-      if (e) {
-        logger.error(e);
-        promise.reject(e);
-      } else {
-        promise.resolve(res);
-      }
-    });
-    return promise.instance;
+
+  execute(code) {
+    return kabuka.fetch(code)
+    .then(payload => this.postSlack(payload));
+  }
+
+  wait(ms) {
+    const prom = {};
+    prom.pending = new Promise((...argv) => { [prom.resolve, prom.reject] = argv; });
+    setTimeout(prom.resolve, ms);
+    return prom.pending;
+  }
+
+  async start() {
+    // eslint-disable-next-line no-restricted-syntax
+    for (let i = 0; i < list.length;) {
+      const code = list[i];
+      await this.execute(code);
+      // eslint-disable-next-line no-plusplus
+      if (++i < list.length) await this.wait(5000);
+    }
   }
 }
-module.exports = {
-  Weather,
-};
+
+new App().start()
+.catch(e => {
+  logger.error(e.message, e);
+});
