@@ -16,6 +16,7 @@ class Kabuka {
       const name = header.querySelector('div:nth-child(1)').textContent;
       const value = header.querySelector('div:nth-child(2)').textContent;
       return {
+        channel: 'C4WN3244D',
         icon_emoji: ':moneybag:',
         username: 'Kabuka',
         text: `${value} - <${uri}|${name} (${code})>`,
