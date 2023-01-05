@@ -1,4 +1,4 @@
-FROM node:buster-slim
+FROM node:lts-bullseye-slim
 SHELL ["bash", "-c"]
 WORKDIR /home/node
 USER node
