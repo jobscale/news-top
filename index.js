@@ -1,12 +1,7 @@
 const { logger } = require('@jobscale/logger');
 const { fetch } = require('@jobscale/fetch');
 const { kabuka } = require('./app');
-
-const list = [
-  ['8316.T', '2497.T', '6143.T', '9432.T'],
-  ['7951.T', '7012.T', '9399.T', '4751.T'],
-  ['8035.T', '4502.T', '8802.T', '8002.T'],
-];
+const { list } = require('./app/list');
 
 class App {
   postSlack(data) {
@@ -24,12 +19,14 @@ class App {
 
   execute(code) {
     return kabuka.fetch(code)
-    .then(text => {
+    .then(rows => {
+      const text = rows.join('\n');
+      logger.info(text);
       this.postSlack({
         channel: 'C4WN3244D',
         icon_emoji: ':moneybag:',
         username: 'Kabuka',
-        text: text.join('\n'),
+        text,
       });
     });
   }
