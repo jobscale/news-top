@@ -5,6 +5,7 @@ const url = 'https://finance.yahoo.co.jp/quote/{{code}}';
 
 class Kabuka {
   fetch(code) {
+    if (Array.isArray()) return Promise.all(code.map(c => this.fetch(c)));
     const uri = url.replace(/{{code}}/, code);
     return fetch.get(uri)
     .then(res => new JSDOM(res.data).window.document)
@@ -15,12 +16,7 @@ class Kabuka {
       const header = section.querySelector('section > div:nth-child(2)');
       const name = header.querySelector('div:nth-child(1)').textContent;
       const value = header.querySelector('div:nth-child(2)').textContent;
-      return {
-        channel: 'C4WN3244D',
-        icon_emoji: ':moneybag:',
-        username: 'Kabuka',
-        text: `${value} - <${uri}|${name} (${code})>`,
-      };
+      return `${value} - <${uri}|${name} (${code})>`;
     });
   }
 }

@@ -3,7 +3,9 @@ const { fetch } = require('@jobscale/fetch');
 const { kabuka } = require('./app');
 
 const list = [
-  '8316.T', '2497.T', '6143.T',
+  ['8316.T', '2497.T', '6143.T', '9432.T'],
+  ['7951.T', '7012.T', '9399.T', '4751.T'],
+  ['8035.T', '4502.T', '8802.T', '8002.T'],
 ];
 
 class App {
@@ -22,7 +24,14 @@ class App {
 
   execute(code) {
     return kabuka.fetch(code)
-    .then(payload => this.postSlack(payload));
+    .then(text => {
+      this.postSlack({
+        channel: 'C4WN3244D',
+        icon_emoji: ':moneybag:',
+        username: 'Kabuka',
+        text: text.join('\n'),
+      });
+    });
   }
 
   wait(ms) {
