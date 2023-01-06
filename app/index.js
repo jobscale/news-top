@@ -16,8 +16,8 @@ class Kabuka {
       const header = section.querySelector('section > div:nth-child(2)');
       const name = header.querySelector('div:nth-child(1)').textContent;
       const value = header.querySelector('div:nth-child(2)').textContent;
-      const sub = header.querySelector('div:nth-child(3) dl').textContent;
-      return `${value} ( ${sub} ) - <${uri}|${name} ( ${code} )>`;
+      const sub = header.querySelector('div:nth-child(3) dl dd').textContent;
+      return `${value}  ${sub}  -  <${uri}|${name}  ${code}>`;
     });
   }
 }
