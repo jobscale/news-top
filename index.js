@@ -1,6 +1,6 @@
 const { logger } = require('@jobscale/logger');
 const { fetch } = require('@jobscale/fetch');
-const { kabuka } = require('./app');
+const { app: news } = require('./app');
 const { list } = require('./app/list');
 
 class App {
@@ -17,15 +17,15 @@ class App {
     return fetch(options);
   }
 
-  execute(code) {
-    return kabuka.fetch(code)
+  execute(uri) {
+    return news.fetch(uri)
     .then(rows => {
-      const text = rows.join('\n');
+      const text = rows.join('\n\n');
       logger.info(text);
       this.postSlack({
         channel: 'C4WN3244D',
         icon_emoji: ':moneybag:',
-        username: 'Kabuka',
+        username: 'News',
         text,
       });
     });
@@ -39,12 +39,10 @@ class App {
   }
 
   async start() {
-    // eslint-disable-next-line no-restricted-syntax
     for (let i = 0; i < list.length;) {
-      const code = list[i];
-      await this.execute(code);
-      // eslint-disable-next-line no-plusplus
-      if (++i < list.length) await this.wait(5000);
+      const uri = list[i];
+      await this.execute(uri);
+      if (++i < list.length) await this.wait(5000); // eslint-disable-line no-plusplus
     }
   }
 }
