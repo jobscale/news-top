@@ -24,7 +24,7 @@ class App {
       logger.info(text);
       this.postSlack({
         channel: 'C4WN3244D',
-        icon_emoji: ':moneybag:',
+        icon_emoji: ':rolled_up_newspaper:',
         username: 'News',
         text,
       });
