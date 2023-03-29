@@ -6,9 +6,8 @@ class App {
     return fetch.get(uri)
     .then(res => new JSDOM(res.data).window.document)
     .then(document => {
-      const cardList = document.querySelectorAll('.live-contents .linelayout-card');
-      const list = Array.from(cardList)
-      .map(v => v.textContent);
+      const list = Array.from(document.querySelectorAll('[aria-label="NEW"]'))
+      .map(el => el.parentElement.parentElement.textContent);
       return list;
     });
   }
