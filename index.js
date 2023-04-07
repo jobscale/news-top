@@ -3,6 +3,7 @@ const { fetch } = require('@jobscale/fetch');
 const { app: news } = require('./app');
 const { list } = require('./app/list');
 
+const wait = ms => new Promise(resolve => { setTimeout(resolve, ms); });
 class App {
   postSlack(data) {
     const url = 'https://tanpo.jsx.jp/api/slack';
@@ -31,18 +32,11 @@ class App {
     });
   }
 
-  wait(ms) {
-    const prom = {};
-    prom.pending = new Promise((...argv) => { [prom.resolve, prom.reject] = argv; });
-    setTimeout(prom.resolve, ms);
-    return prom.pending;
-  }
-
   async start() {
     for (let i = 0; i < list.length;) {
       const uri = list[i];
       await this.execute(uri);
-      if (++i < list.length) await this.wait(5000); // eslint-disable-line no-plusplus
+      if (++i < list.length) await wait(10000); // eslint-disable-line no-plusplus
     }
   }
 }
