@@ -4,6 +4,7 @@ const { app: news } = require('./app');
 const { list } = require('./app/list');
 
 const wait = ms => new Promise(resolve => { setTimeout(resolve, ms); });
+
 class App {
   postSlack(data) {
     const url = 'https://tanpo.jsx.jp/api/slack';
@@ -21,8 +22,9 @@ class App {
   execute(uri) {
     return news.fetch(uri)
     .then(rows => {
+      logger.info(JSON.stringify({ uri, rows }));
+      if (!rows.length) return;
       const text = rows.join('\n\n');
-      logger.info(text);
       this.postSlack({
         channel: 'C4WN3244D',
         icon_emoji: ':rolled_up_newspaper:',
