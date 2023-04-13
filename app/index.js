@@ -15,6 +15,7 @@ const ddb = new DynamoDBClient({
   maxAttempts: 20,
   logger,
   endpoint: 'https://ddb.jsx.jp',
+  region: 'ap-northeast-1',
 });
 const ddbDoc = new DynamoDBDocumentClient(ddb);
 
