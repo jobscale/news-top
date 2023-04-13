@@ -60,7 +60,7 @@ class App {
               WriteCapacityUnits: 1,
             },
           }));
-          await wait(5000);
+          await wait(15000);
         });
         if (!Item) {
           await ddbDoc.send(new PutCommand({
