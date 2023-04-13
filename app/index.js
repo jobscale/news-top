@@ -11,6 +11,7 @@ const {
 } = require('@aws-sdk/lib-dynamodb');
 
 const logger = console;
+const wait = ms => new Promise(resolve => { setTimeout(resolve, ms); });
 const auth = JSON.parse(Buffer.from('eyJpZCI6IkFLSUEyWFBUNkVEN09WQTY3SVY3Iiwia2V5IjoiNjM5YUtFWWRMV3Y5YXVoUlltT0F1ZXRUVDFzYUkvVEhJMHg5ZVBENiJ9', 'base64').toString());
 Object.assign(process.env, {
   AWS_REGION: 'ap-northeast-1',
@@ -59,6 +60,7 @@ class App {
               WriteCapacityUnits: 1,
             },
           }));
+          await wait(5000);
         });
         if (!Item) {
           await ddbDoc.send(new PutCommand({
