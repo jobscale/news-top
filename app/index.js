@@ -37,7 +37,7 @@ class App {
       const TableName = 'News';
       const news = [];
       for (const Title of list) { // eslint-disable-line no-restricted-syntax
-        const data = await ddbDoc.send(new GetCommand({
+        const { Item } = await ddbDoc.send(new GetCommand({
           TableName,
           Key: { Title },
         }))
@@ -60,7 +60,7 @@ class App {
             },
           }));
         });
-        if (!data.Item) {
+        if (!Item) {
           await ddbDoc.send(new PutCommand({
             TableName,
             Item: { Title },
