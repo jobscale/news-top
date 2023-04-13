@@ -18,6 +18,7 @@ Object.assign(process.env, {
   AWS_ACCESS_KEY_ID: auth.id,
   AWS_SECRET_ACCESS_KEY: auth.key,
 });
+const TableName = 'News';
 const ddb = new DynamoDBClient({
   maxAttempts: 20,
   logger,
@@ -35,43 +36,47 @@ class App {
       return list;
     })
     .then(async list => {
-      const TableName = 'News';
       const news = [];
       for (const Title of list) { // eslint-disable-line no-restricted-syntax
-        const { Item } = await ddbDoc.send(new GetCommand({
-          TableName,
-          Key: { Title },
-        }))
-        .catch(async e => {
-          logger.error(e);
-          await ddb.send(new CreateTableCommand({
-            TableName,
-            BillingMode: 'PAY_PER_REQUEST',
-            AttributeDefinitions: [{
-              AttributeName: 'Title',
-              AttributeType: 'S',
-            }],
-            KeySchema: [{
-              AttributeName: 'Title',
-              KeyType: 'HASH',
-            }],
-            ProvisionedThroughput: {
-              ReadCapacityUnits: 1,
-              WriteCapacityUnits: 1,
-            },
-          }));
-          await wait(15000);
-        });
-        if (!Item) {
-          await ddbDoc.send(new PutCommand({
-            TableName,
-            Item: { Title },
-          }));
-          news.push(Title);
-        }
+        const item = await this.runItem(Title)
+        .catch(e => logger.error(e) || this.runItem(Title));
+        if (item) news.push(item);
       }
       return news;
     });
+  }
+
+  async runItem(Title) {
+    const { Item } = await ddbDoc.send(new GetCommand({
+      TableName,
+      Key: { Title },
+    }))
+    .catch(async e => {
+      logger.error(e);
+      await ddb.send(new CreateTableCommand({
+        TableName,
+        BillingMode: 'PAY_PER_REQUEST',
+        AttributeDefinitions: [{
+          AttributeName: 'Title',
+          AttributeType: 'S',
+        }],
+        KeySchema: [{
+          AttributeName: 'Title',
+          KeyType: 'HASH',
+        }],
+        ProvisionedThroughput: {
+          ReadCapacityUnits: 1,
+          WriteCapacityUnits: 1,
+        },
+      }));
+      await wait(15000);
+    });
+    if (Item) return undefined;
+    await ddbDoc.send(new PutCommand({
+      TableName,
+      Item: { Title },
+    }));
+    return Title;
   }
 }
 
