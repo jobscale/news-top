@@ -21,16 +21,18 @@ class App {
 
   execute(uri) {
     return news.fetch(uri)
-    .then(rows => {
+    .then(async rows => {
       logger.info(JSON.stringify({ uri, rows }));
       if (!rows.length) return;
-      const text = rows.join('\n\n');
-      this.postSlack({
-        channel: 'C4WN3244D',
-        icon_emoji: ':rolled_up_newspaper:',
-        username: 'News',
-        text,
-      });
+      for (let i = 0; rows.length;) {
+        await this.postSlack({
+          channel: 'C4WN3244D',
+          icon_emoji: ':rolled_up_newspaper:',
+          username: 'News',
+          text: rows[i],
+        });
+        if (++i < list.length) await wait(8000); // eslint-disable-line no-plusplus
+      }
     });
   }
 
@@ -38,7 +40,7 @@ class App {
     for (let i = 0; i < list.length;) {
       const uri = list[i];
       await this.execute(uri);
-      if (++i < list.length) await wait(10000); // eslint-disable-line no-plusplus
+      if (++i < list.length) await wait(7000); // eslint-disable-line no-plusplus
     }
   }
 }

@@ -31,16 +31,16 @@ class App {
     return fetch.get(uri)
     .then(res => new JSDOM(res.data).window.document)
     .then(document => {
-      const list = Array.from(document.querySelectorAll('[aria-label="NEW"]'))
-      .map(el => el.parentElement.parentElement.textContent);
-      return list;
+      const anchorList = Array.from(document.querySelectorAll('[aria-label="NEW"]'))
+      .map(el => el.parentElement.parentElement);
+      return anchorList;
     })
-    .then(async list => {
+    .then(async anchorList => {
       const news = [];
-      for (const Title of list) { // eslint-disable-line no-restricted-syntax
-        const item = await this.runItem(Title)
-        .catch(e => logger.error(e) || this.runItem(Title));
-        if (item) news.push(item);
+      for (const anchor of anchorList) { // eslint-disable-line no-restricted-syntax
+        const item = await this.runItem(anchor.textContent)
+        .catch(e => logger.error(e) || this.runItem(anchor.textContent));
+        if (item) news.push(`<${anchor.href}|${item}>`);
       }
       return news;
     });
