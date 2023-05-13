@@ -34,7 +34,7 @@ class App {
         if (++i < list.length) await wait(8000); // eslint-disable-line no-plusplus
       }
     })
-    .catch(e => logger.error({ error: e.massage, uri }));
+    .catch(e => logger.error({ error: e.massage, status: e.status, uri }));
   }
 
   async start() {
