@@ -19,30 +19,29 @@ class App {
     return fetch(options);
   }
 
-  execute(uri) {
+  async post(rowsList) {
+    const rows = rowsList.flat();
+    if (!rows.length) return;
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i < rows.length && !await wait(8000); i++) {
+      await this.postSlack({
+        channel: 'C4WN3244D',
+        icon_emoji: ':rolled_up_newspaper:',
+        username: 'News',
+        text: rows[i],
+      });
+    }
+  }
+
+  fetch(uri) {
     return news.fetch(uri)
-    .then(async rows => {
-      logger.info(JSON.stringify({ uri, rows }));
-      if (!rows.length) return;
-      for (let i = 0; rows.length;) {
-        await this.postSlack({
-          channel: 'C4WN3244D',
-          icon_emoji: ':rolled_up_newspaper:',
-          username: 'News',
-          text: rows[i],
-        });
-        if (++i < list.length) await wait(8000); // eslint-disable-line no-plusplus
-      }
-    })
-    .catch(e => logger.error({ error: e.massage, status: e.status, uri }));
+    .then(rows => logger.info(JSON.stringify({ uri, rows })) || rows)
+    .catch(e => logger.error({ error: e.massage, status: e.status, uri }) || []);
   }
 
   async start() {
-    for (let i = 0; i < list.length;) {
-      const uri = list[i];
-      await this.execute(uri);
-      if (++i < list.length) await wait(7000); // eslint-disable-line no-plusplus
-    }
+    const rows = await Promise.all(list.map(uri => this.fetch(uri)));
+    return this.post(rows);
   }
 }
 
