@@ -23,7 +23,7 @@ class App {
     const rows = rowsList.flat();
     if (!rows.length) return;
     // eslint-disable-next-line no-plusplus
-    for (let i = 0; i < rows.length && !await wait(8000); i++) {
+    for (let i = 0; i < rows.length; i++ && await wait(8000)) {
       await this.postSlack({
         channel: 'C4WN3244D',
         icon_emoji: ':rolled_up_newspaper:',
