@@ -1,22 +1,19 @@
 const { logger } = require('@jobscale/logger');
-const { fetch } = require('@jobscale/fetch');
 const { app: news } = require('./app');
 const { list } = require('./app/list');
 
 const wait = ms => new Promise(resolve => { setTimeout(resolve, ms); });
 
 class App {
-  postSlack(data) {
-    const url = 'https://tanpo.jsx.jp/api/slack';
+  postSlack(body) {
+    const url = 'https://jsx.jp/api/slack';
     const options = {
       url,
       method: 'post',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      data,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
     };
-    return fetch(options);
+    return fetch(url, options);
   }
 
   async post(rowsList) {
@@ -25,7 +22,7 @@ class App {
     // eslint-disable-next-line no-plusplus
     for (let i = 0; i < rows.length; ++i && await wait(8000)) {
       await this.postSlack({
-        channel: 'C4WN3244D',
+        channel: '#random',
         icon_emoji: ':rolled_up_newspaper:',
         username: 'News',
         text: rows[i],
@@ -36,11 +33,15 @@ class App {
   fetch(uri) {
     return news.fetch(uri)
     .then(rows => logger.info(JSON.stringify({ uri, rows })) || rows)
-    .catch(e => logger.error({ error: e.massage, status: e.status, uri }) || []);
+    .catch(e => logger.error({ e, uri }) || []);
   }
 
   async start() {
-    const rows = await Promise.all(list.map(uri => this.fetch(uri)));
+    const rows = [];
+    // eslint-disable-next-line no-restricted-syntax
+    for (const uri of list) {
+      rows.push(await this.fetch(uri));
+    }
     return this.post(rows);
   }
 }

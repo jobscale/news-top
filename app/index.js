@@ -1,4 +1,3 @@
-const { fetch } = require('@jobscale/fetch');
 const { JSDOM } = require('jsdom');
 const {
   DynamoDBClient,
@@ -28,8 +27,9 @@ const ddbDoc = new DynamoDBDocumentClient(ddb);
 
 class App {
   fetch(uri) {
-    return fetch.get(uri)
-    .then(res => new JSDOM(res.data).window.document)
+    return fetch(uri)
+    .then(res => res.text())
+    .then(body => new JSDOM(body).window.document)
     .then(document => {
       const anchorList = Array.from(document.querySelectorAll('[aria-label="NEW"]'))
       .map(el => el.parentElement.parentElement);
