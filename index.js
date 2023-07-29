@@ -19,13 +19,16 @@ class App {
   async post(rowsList) {
     const rows = rowsList.flat();
     if (!rows.length) return;
-    // eslint-disable-next-line no-plusplus
-    for (let i = 0; i < rows.length; ++i && await wait(8000)) {
+    const opts = {};
+    // eslint-disable-next-line no-restricted-syntax
+    for (const row of rows) {
+      if (!opts.first) opts.first = true;
+      else await wait(8000);
       await this.postSlack({
         channel: '#random',
         icon_emoji: ':rolled_up_newspaper:',
         username: 'News',
-        text: rows[i],
+        text: row,
       });
     }
   }
