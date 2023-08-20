@@ -23,7 +23,7 @@ class App {
     // eslint-disable-next-line no-restricted-syntax
     for (const row of rows) {
       if (!opts.first) opts.first = true;
-      else await wait(8000);
+      else await wait(10000);
       await this.postSlack({
         channel: '#random',
         icon_emoji: ':rolled_up_newspaper:',
@@ -50,6 +50,4 @@ class App {
 }
 
 new App().start()
-.catch(e => {
-  logger.error(e.message, e);
-});
+.catch(e => logger.error(e));
