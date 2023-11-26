@@ -48,6 +48,10 @@ class App {
   }
 
   async runItem(Title) {
+    const deny = ['か$', 'も$'];
+    const title = Title.trim();
+    const isDeny = deny.filter(text => title.match(new RegExp(text))).length;
+    if (isDeny) return undefined;
     const { Item } = await ddbDoc.send(new GetCommand({
       TableName,
       Key: { Title },
