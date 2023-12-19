@@ -41,7 +41,10 @@ class App {
       for (const anchor of anchorList) { // eslint-disable-line no-restricted-syntax
         const item = await this.runItem(anchor.textContent)
         .catch(e => logger.error(e) || this.runItem(anchor.textContent));
-        if (item) news.push(`<${anchor.href}|${item}>`);
+        if (item) {
+          news.push(`<${anchor.href}|${item}>`);
+          break;
+        }
       }
       return news;
     });

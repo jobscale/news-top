@@ -43,7 +43,11 @@ class App {
     const rows = [];
     // eslint-disable-next-line no-restricted-syntax
     for (const uri of list) {
-      rows.push(await this.fetch(uri));
+      const items = await this.fetch(uri);
+      if (items.length) {
+        rows.push(...items);
+        break;
+      }
     }
     return this.post(rows);
   }
