@@ -72,10 +72,6 @@ class App {
           AttributeName: 'Title',
           KeyType: 'HASH',
         }],
-        ProvisionedThroughput: {
-          ReadCapacityUnits: 1,
-          WriteCapacityUnits: 1,
-        },
       }));
       await wait(15000);
     });
