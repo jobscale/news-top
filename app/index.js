@@ -18,7 +18,7 @@ Object.assign(process.env, {
   AWS_SECRET_ACCESS_KEY: auth.key,
 });
 const TableName = 'News';
-const endpoint = 'https://ddb.jsx.jp';
+const endpoint = 'https://lo-stack.jsx.jp';
 const ddb = new DynamoDBClient({
   maxAttempts: 20,
   logger,
