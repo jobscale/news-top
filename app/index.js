@@ -28,7 +28,12 @@ const ddbDoc = new DynamoDBDocumentClient(ddb);
 
 class App {
   fetch(uri) {
-    return fetch(uri)
+    return fetch(uri, {
+      headers: {
+        'accept-language': 'ja',
+        'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+      },
+    })
     .then(res => res.text())
     .then(body => new JSDOM(body).window.document)
     .then(document => {
