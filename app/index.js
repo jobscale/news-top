@@ -82,6 +82,32 @@ class App {
     }));
     return Title;
   }
+
+  async amz(list) {
+    const priseList = [];
+    // eslint-disable-next-line no-restricted-syntax
+    for (const amz of list) {
+      const price = await this.fetchAmz(amz.uri);
+      priseList.push(`${amz.name} <${amz.uri}|${price}>`);
+    }
+    return priseList.join('\n');
+  }
+
+  fetchAmz(uri) {
+    return fetch(uri, {
+      headers: {
+        authority: 'www.amazon.co.jp',
+        'accept-language': 'ja',
+        'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+      },
+    })
+    .then(res => res.text())
+    .then(body => new JSDOM(body).window.document)
+    .then(document => {
+      const anchor = document.querySelector('#corePriceDisplay_desktop_feature_div');
+      return anchor.querySelector('.a-price-whole').textContent;
+    });
+  }
 }
 
 module.exports = {

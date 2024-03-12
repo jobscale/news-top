@@ -6,6 +6,14 @@ const list = [
   'https://news.yahoo.co.jp/categories/science',
 ];
 
+const amz = [
+  { name: 'DDR 64GB', uri: 'https://www.amazon.co.jp/gp/product/B093NHR9G1/' },
+  { name: 'DDR 64GB', uri: 'https://www.amazon.co.jp/gp/product/B07ZLCVKPV/' },
+  { name: 'DDR 64GB', uri: 'https://www.amazon.co.jp/gp/product/B09578GQF1/' },
+  { name: 'DDR 64GB', uri: 'https://www.amazon.co.jp/gp/product/B08XBCQXDV/' },
+];
+
 module.exports = {
   list,
+  amz,
 };

@@ -1,6 +1,6 @@
 const { logger } = require('@jobscale/logger');
 const { app: news } = require('./app');
-const { list } = require('./app/list');
+const { list, amz } = require('./app/list');
 
 const wait = ms => new Promise(resolve => { setTimeout(resolve, ms); });
 
@@ -39,6 +39,12 @@ class App {
     .catch(e => logger.error({ e, uri }) || []);
   }
 
+  async amz() {
+    return news.amz(amz)
+    .then(row => this.post([row]))
+    .catch(e => logger.error(e));
+  }
+
   async start() {
     const rows = [];
     // eslint-disable-next-line no-restricted-syntax
@@ -49,6 +55,7 @@ class App {
         break;
       }
     }
+    if (!rows.length) return this.amz();
     return this.post(rows);
   }
 }
