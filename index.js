@@ -1,3 +1,4 @@
+const dayjs = require('dayjs');
 const { logger } = require('@jobscale/logger');
 const { app: news } = require('./app');
 const { list, amz } = require('./app/list');
@@ -55,8 +56,13 @@ class App {
         break;
       }
     }
-    if (!rows.length) return this.amz();
-    return this.post(rows);
+    if (!rows.length) {
+      const hour = dayjs().add(9, 'hour').hour();
+      if (hour >= 21 || hour < 8) return;
+      await this.amz();
+      return;
+    }
+    await this.post(rows);
   }
 }
 
