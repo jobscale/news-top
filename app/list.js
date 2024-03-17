@@ -7,10 +7,10 @@ const list = [
 ];
 
 const amz = [
-  { name: 'DDR 64GB', uri: 'https://www.amazon.co.jp/gp/product/B093NHR9G1/' },
-  { name: 'DDR 64GB', uri: 'https://www.amazon.co.jp/gp/product/B07ZLCVKPV/' },
-  { name: 'DDR 64GB', uri: 'https://www.amazon.co.jp/gp/product/B09578GQF1/' },
-  { name: 'DDR 64GB', uri: 'https://www.amazon.co.jp/gp/product/B08XBCQXDV/' },
+  { name: 'DDR 64GB', sale: 16000, uri: 'https://www.amazon.co.jp/gp/product/B093NHR9G1/' },
+  { name: 'DDR 64GB', sale: 16000, uri: 'https://www.amazon.co.jp/gp/product/B07ZLCVKPV/' },
+  { name: 'DDR 64GB', sale: 16000, uri: 'https://www.amazon.co.jp/gp/product/B09578GQF1/' },
+  { name: 'DDR 64GB', sale: 16000, uri: 'https://www.amazon.co.jp/gp/product/B08XBCQXDV/' },
 ];
 
 module.exports = {

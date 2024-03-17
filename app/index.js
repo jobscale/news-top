@@ -93,9 +93,10 @@ class App {
     // eslint-disable-next-line no-restricted-syntax
     for (const amz of list) {
       const price = await this.fetchAmz(amz.uri);
-      priseList.push(`${amz.name} <${amz.uri}|${price}>`);
+      const sale = Number.parseInt(price.replace(/,/g, ''), 10);
+      if (sale < amz.sale) priseList.push(`${amz.name} <${amz.uri}|${price}>`);
     }
-    return priseList.join('\n');
+    return priseList;
   }
 
   fetchAmz(uri) {

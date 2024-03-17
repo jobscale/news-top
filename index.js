@@ -42,7 +42,12 @@ class App {
 
   async amz() {
     return news.amz(amz)
-    .then(row => this.post([row]))
+    .then(priseList => {
+      logger.info(JSON.stringify({ priseList }));
+      if (!priseList.length) return undefined;
+      const text = priseList.join('\n');
+      return this.post([text]);
+    })
     .catch(e => logger.error(e));
   }
 
