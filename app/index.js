@@ -92,11 +92,14 @@ class App {
     const priseList = [];
     // eslint-disable-next-line no-restricted-syntax
     for (const amz of list) {
-      const price = await this.fetchAmz(amz.uri);
-      const sale = Number.parseInt(price.replace(/,/g, ''), 10);
-      if (sale < amz.sale) priseList.push(`${amz.name} <${amz.uri}|${price}>`);
+      await this.fetchAmz(amz.uri)
+      .then(price => priseList.push({ ...amz, price }))
+      .catch(e => logger.error(JSON.stringify({ message: e.message, amz })));
     }
-    return priseList;
+    return priseList.filter(amz => {
+      const sale = Number.parseInt(amz.price.replace(/,/g, ''), 10);
+      return sale < amz.sale;
+    }).map(amz => `${amz.name} <${amz.uri}|${amz.price}>`);
   }
 
   fetchAmz(uri) {
