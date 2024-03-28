@@ -11,6 +11,7 @@ const {
 
 const logger = console;
 const wait = ms => new Promise(resolve => { setTimeout(resolve, ms); });
+const toNumber = num => num.toLocaleString();
 const auth = JSON.parse(Buffer.from('eyJpZCI6IkFLSUEyWFBUNkVEN09WQTY3SVY3Iiwia2V5IjoiNjM5YUtFWWRMV3Y5YXVoUlltT0F1ZXRUVDFzYUkvVEhJMHg5ZVBENiJ9', 'base64').toString());
 Object.assign(process.env, {
   AWS_REGION: 'ap-northeast-1',
@@ -88,7 +89,7 @@ class App {
     return Title;
   }
 
-  async amz(list) {
+  async amz(list, ts) {
     const priseList = [];
     // eslint-disable-next-line no-restricted-syntax
     for (const amz of list) {
@@ -96,8 +97,12 @@ class App {
       .then(price => priseList.push({ ...amz, price }))
       .catch(e => logger.error(JSON.stringify({ message: e.message, amz })));
     }
+    logger.info(ts, JSON.stringify(priseList.map(
+      amz => `${amz.name} = ${amz.price} / ${toNumber(amz.sale)}`,
+    ), null, 2));
     return priseList.filter(amz => {
       const sale = Number.parseInt(amz.price.replace(/,/g, ''), 10);
+      if (ts > '20:50') return true;
       return sale < amz.sale;
     }).map(amz => `${amz.name} <${amz.uri}|${amz.price}>`);
   }

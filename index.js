@@ -40,10 +40,10 @@ class App {
     .catch(e => logger.error({ e, uri }) || []);
   }
 
-  async amz() {
-    return news.amz(amz)
+  async amz(ts) {
+    return news.amz(amz, ts)
     .then(priseList => {
-      logger.info(JSON.stringify({ priseList }));
+      logger.info(JSON.stringify({ ts, priseList }));
       if (!priseList.length) return undefined;
       const text = priseList.join('\n');
       return this.post([text]);
@@ -62,9 +62,12 @@ class App {
       }
     }
     if (!rows.length) {
-      const hour = dayjs().add(9, 'hour').hour();
-      if (hour >= 21 || hour < 8) return;
-      await this.amz();
+      const ts = dayjs().add(9, 'hour').format('hh:mm');
+      if (ts >= '21:00' || ts < '08:00') {
+        logger.info({ silent: ts });
+        return;
+      }
+      await this.amz(ts);
       return;
     }
     await this.post(rows);
