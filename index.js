@@ -34,9 +34,9 @@ class App {
     }
   }
 
-  fetch(uri) {
+  fetch(uri, ts) {
     return news.fetch(uri)
-    .then(rows => logger.info(JSON.stringify({ uri, rows })) || rows)
+    .then(rows => logger.info(JSON.stringify({ ts, uri, rows })) || rows)
     .catch(e => logger.error({ e, uri }) || []);
   }
 
@@ -52,25 +52,20 @@ class App {
   }
 
   async start() {
+    const ts = dayjs().add(9, 'hour').format('hh:mm');
     const rows = [];
     // eslint-disable-next-line no-restricted-syntax
     for (const uri of list) {
-      const items = await this.fetch(uri);
+      const items = await this.fetch(uri, ts);
       if (items.length) {
         rows.push(...items);
         break;
       }
     }
-    if (!rows.length) {
-      const ts = dayjs().add(9, 'hour').format('hh:mm');
-      if (ts >= '21:00' || ts < '08:00') {
-        logger.info({ silent: ts });
-        return;
-      }
-      await this.amz(ts);
-      return;
-    }
     await this.post(rows);
+    if (rows.length) return;
+    if (ts >= '21:00' || ts < '08:00') return;
+    await this.amz(ts);
   }
 }
 
