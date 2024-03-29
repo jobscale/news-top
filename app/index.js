@@ -22,7 +22,7 @@ const TableName = 'News';
 const endpoint = 'https://lo-stack.jsx.jp';
 const ddb = new DynamoDBClient({
   maxAttempts: 20,
-  logger,
+  // logger,
   endpoint,
 });
 const ddbDoc = new DynamoDBDocumentClient(ddb);

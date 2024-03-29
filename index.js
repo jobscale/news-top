@@ -1,8 +1,9 @@
 const dayjs = require('dayjs');
-const { logger } = require('@jobscale/logger');
+const { Logger } = require('@jobscale/logger');
 const { app: news } = require('./app');
 const { list, amz } = require('./app/list');
 
+const logger = new Logger({ timestamp: true });
 const wait = ms => new Promise(resolve => { setTimeout(resolve, ms); });
 
 class App {
