@@ -103,7 +103,7 @@ class App {
     return priseList.filter(amz => {
       const sale = Number.parseInt(amz.price.replace(/,/g, ''), 10);
       if (ts > '20:50') return true;
-      return sale < amz.sale;
+      return sale <= amz.sale;
     }).map(amz => `${amz.name} <${amz.uri}|${amz.price}>`);
   }
 
