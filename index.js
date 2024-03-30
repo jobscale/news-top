@@ -44,7 +44,7 @@ class App {
   async amz(ts) {
     return news.amz(amz, ts)
     .then(priseList => {
-      logger.info(JSON.stringify({ ts, priseList }, null, 2));
+      logger.info(ts, JSON.stringify(priseList, null, 2));
       if (!priseList.length) return undefined;
       const text = priseList.join('\n');
       return this.post([text]);
