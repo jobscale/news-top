@@ -98,7 +98,7 @@ class App {
       .catch(e => logger.error(JSON.stringify({ message: e.message, amz })));
     }
     logger.info(ts, JSON.stringify(priseList.map(
-      amz => `${amz.name} = ${amz.price} / ${toNumber(amz.sale)}`,
+      amz => `${amz.name} = ${toNumber(amz.sale)} / ${amz.price}`,
     ), null, 2));
     return priseList.filter(amz => {
       const sale = Number.parseInt(amz.price.replace(/,/g, ''), 10);
