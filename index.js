@@ -53,7 +53,7 @@ class App {
   }
 
   async start() {
-    const ts = dayjs().add(9, 'hour').format('hh:mm');
+    const ts = dayjs().add(9, 'hour').format('HH:mm');
     const rows = [];
     // eslint-disable-next-line no-restricted-syntax
     for (const uri of list) {
