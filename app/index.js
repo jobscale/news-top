@@ -44,7 +44,7 @@ class App {
     })
     .then(async anchorList => {
       const news = [];
-      for (const anchor of anchorList) { // eslint-disable-line no-restricted-syntax
+      for (const anchor of anchorList) {
         const item = await this.runItem(anchor.textContent)
         .catch(e => logger.error(e) || this.runItem(anchor.textContent));
         if (item) {
@@ -91,7 +91,6 @@ class App {
 
   async amz(list, ts) {
     const priseList = [];
-    // eslint-disable-next-line no-restricted-syntax
     for (const amz of list) {
       await this.fetchAmz(amz.uri)
       .then(price => priseList.push({ ...amz, price }))
@@ -102,8 +101,7 @@ class App {
     ), null, 2));
     return priseList.filter(amz => {
       const sale = Number.parseInt(amz.price.replace(/,/g, ''), 10);
-      const [, min] = ts.split(':');
-      if (min > '40') return true;
+      if (ts >= '12:00' && ts <= '12:10') return true;
       return sale <= amz.sale;
     }).map(amz => `${amz.name} <${amz.uri}|${amz.price}>`);
   }

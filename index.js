@@ -22,7 +22,6 @@ class App {
     const rows = rowsList.flat();
     if (!rows.length) return;
     const opts = {};
-    // eslint-disable-next-line no-restricted-syntax
     for (const row of rows) {
       if (!opts.first) opts.first = true;
       else await wait(10000);
@@ -55,7 +54,6 @@ class App {
   async start() {
     const ts = dayjs().add(9, 'hour').format('HH:mm');
     const rows = [];
-    // eslint-disable-next-line no-restricted-syntax
     for (const uri of list) {
       const items = await this.fetch(uri, ts);
       if (items.length) {
@@ -64,6 +62,10 @@ class App {
       }
     }
     await this.post(rows);
+    if (ts >= '12:00' && ts <= '12:10') {
+      await this.amz(ts);
+      return;
+    }
     if (rows.length) return;
     if (ts >= '21:00' || ts < '08:00') return;
     await this.amz(ts);
