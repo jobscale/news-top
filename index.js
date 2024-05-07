@@ -52,7 +52,9 @@ class App {
   }
 
   async start() {
-    const ts = dayjs().add(9, 'hour').format('HH:mm');
+    const [, time] = dayjs().add(9, 'hour').toISOString().split('T');
+    const [hh, mm] = time.split(':');
+    const ts = `${hh}:${mm}`;
     const rows = [];
     for (const uri of list) {
       const items = await this.fetch(uri, ts);
