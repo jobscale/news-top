@@ -57,7 +57,7 @@ class App {
   }
 
   async runItem(Title) {
-    const deny = ['か$', 'も$'];
+    const deny = ['か$', 'も$', '語る', '\\?'];
     const title = Title.trim();
     const isDeny = deny.filter(text => title.match(new RegExp(text))).length;
     if (isDeny) return undefined;
