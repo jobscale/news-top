@@ -1,3 +1,4 @@
+const dayjs = require('dayjs');
 const { JSDOM } = require('jsdom');
 const {
   DynamoDBClient,
@@ -8,11 +9,12 @@ const {
   PutCommand,
   GetCommand,
 } = require('@aws-sdk/lib-dynamodb');
+const env = require('./env.json');
 
 const logger = console;
 const wait = ms => new Promise(resolve => { setTimeout(resolve, ms); });
 const toNumber = num => num.toLocaleString();
-const auth = JSON.parse(Buffer.from('eyJpZCI6IkFLSUEyWFBUNkVEN09WQTY3SVY3Iiwia2V5IjoiNjM5YUtFWWRMV3Y5YXVoUlltT0F1ZXRUVDFzYUkvVEhJMHg5ZVBENiJ9', 'base64').toString());
+const auth = JSON.parse(Buffer.from(env.auth, 'base64').toString());
 Object.assign(process.env, {
   AWS_REGION: 'ap-northeast-1',
   AWS_ACCESS_KEY_ID: auth.id,
@@ -91,7 +93,53 @@ class App {
       TableName,
       Item: { Title },
     }));
+
+    const getHistory = async () => {
+      const { Item: { history } } = await ddbDoc.send(new GetCommand({
+        TableName,
+        Key: { Title: 'history' },
+      }));
+      return history;
+    };
+    const LIMIT = dayjs().subtract(7, 'day').unix();
+    const history = (await getHistory()
+    .catch(e => {
+      logger.warn(JSON.stringify(e));
+      return [];
+    }))
+    .filter(v => v.timestamp >= LIMIT);
+    history.push({ Title, timestamp: dayjs().unix() });
+    const titles = history.map(v => v.Title);
+    if (this.hasDuplicate(Title, titles, 0.5)) return undefined;
+    await ddbDoc.send(new PutCommand({
+      TableName,
+      Item: { Title: 'history', history },
+    }));
+
     return Title;
+  }
+
+  hasDuplicate(target, titles, threshold = 0.5) {
+    for (const title of titles) {
+      const isDuplicate = this.similarity(title, target) >= threshold;
+      if (isDuplicate) return true;
+    }
+    return false;
+  }
+
+  similarity(a, b) {
+    const setA = [...a];
+    const setB = [...b];
+    let match = 0;
+    for (const ch of setA) {
+      const index = setB.indexOf(ch);
+      if (index !== -1) {
+        match += 1;
+        setB.splice(index, 1); // 一度一致した文字は使わない
+      }
+    }
+    const maxLength = Math.max(setA.length, b.length);
+    return match / maxLength; // 一致率
   }
 
   async amz(list, ts) {
