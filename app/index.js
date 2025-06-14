@@ -110,7 +110,7 @@ class App {
     .filter(v => v.timestamp >= LIMIT);
     history.push({ Title, timestamp: dayjs().unix() });
     const titles = history.map(v => v.Title);
-    if (this.hasDuplicate(Title, titles, 0.5)) return undefined;
+    if (this.hasDuplicate(Title, titles, 0.8)) return undefined;
     await ddbDoc.send(new PutCommand({
       TableName,
       Item: { Title: 'history', history },
