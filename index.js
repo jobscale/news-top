@@ -1,7 +1,7 @@
-const dayjs = require('dayjs');
-const { Logger } = require('@jobscale/logger');
-const { app: news } = require('./app');
-const { list, amz } = require('./app/list');
+import dayjs from 'dayjs';
+import { Logger } from '@jobscale/logger';
+import { app as news } from './app/index.js';
+import { list, amz } from './app/list.js';
 
 const logger = new Logger({ timestamp: true });
 const wait = ms => new Promise(resolve => { setTimeout(resolve, ms); });

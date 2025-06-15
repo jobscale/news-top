@@ -1,17 +1,10 @@
-const dayjs = require('dayjs');
-const { JSDOM } = require('jsdom');
-const {
-  DynamoDBClient,
-  CreateTableCommand,
-} = require('@aws-sdk/client-dynamodb');
-const {
-  DynamoDBDocumentClient,
-  PutCommand,
-  GetCommand,
-} = require('@aws-sdk/lib-dynamodb');
-const env = require('./env.json');
+import dayjs from 'dayjs';
+import { JSDOM } from 'jsdom';
+import { DynamoDBClient, CreateTableCommand } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient, PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
+import logger from '@jobscale/logger';
+import env from './env.json' assert { type: 'json' };
 
-const logger = console;
 const wait = ms => new Promise(resolve => { setTimeout(resolve, ms); });
 const toNumber = num => num.toLocaleString();
 const auth = JSON.parse(Buffer.from(env.auth, 'base64').toString());
@@ -29,7 +22,7 @@ const ddb = new DynamoDBClient({
 });
 const ddbDoc = new DynamoDBDocumentClient(ddb);
 
-class App {
+export default class App {
   fetch(uri) {
     return fetch(uri, {
       headers: {
@@ -175,7 +168,4 @@ class App {
   }
 }
 
-module.exports = {
-  App,
-  app: new App(),
-};
+export const app = new App();

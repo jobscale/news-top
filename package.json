@@ -1,12 +1,13 @@
 {
   "name": "news-top",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.1.1",
   "description": "news",
   "keywords": [
     "news"
   ],
   "author": "jobscale <jobscale@users.noreply.github.com>",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "start": "TZ=Etc/GMT node .",
