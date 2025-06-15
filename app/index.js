@@ -101,7 +101,7 @@ class App {
       }));
       return history;
     };
-    const LIMIT = dayjs().subtract(7, 'day').unix();
+    const LIMIT = dayjs().subtract(30, 'day').unix();
     const history = (await getHistory()
     .catch(e => {
       logger.warn(JSON.stringify(e));
@@ -109,13 +109,13 @@ class App {
     }))
     .filter(v => v.timestamp >= LIMIT);
     const titles = history.map(v => v.Title);
-    if (this.hasDuplicate(Title, titles, 0.5)) return undefined;
-    history.push({ Title, timestamp: dayjs().unix() });
+    const duplicate = this.hasDuplicate(Title, titles, 0.5);
+    history.push({ Title, timestamp: dayjs().unix(), duplicate });
     await ddbDoc.send(new PutCommand({
       TableName,
       Item: { Title: 'history', history },
     }));
-
+    if (duplicate) return undefined;
     return Title;
   }
 
