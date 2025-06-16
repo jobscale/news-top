@@ -3,7 +3,7 @@ import { JSDOM } from 'jsdom';
 import { DynamoDBClient, CreateTableCommand } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
 import logger from '@jobscale/logger';
-import env from './env.json' assert { type: 'json' };
+import env from './env.js';
 
 const wait = ms => new Promise(resolve => { setTimeout(resolve, ms); });
 const toNumber = num => num.toLocaleString();
