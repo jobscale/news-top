@@ -14,9 +14,13 @@ module.exports = {
       ExportDeclaration: { minProperties: 6, multiline: true, consistent: true },
     }],
     'no-restricted-syntax': 'off',
+    'import/extensions': 'off',
   },
   env: {
     'jest/globals': true,
+  },
+  parserOptions: {
+    sourceType: 'module',
   },
   plugins: [
     'jest',
