@@ -40,8 +40,9 @@ export default class App {
     .then(async anchorList => {
       const news = [];
       for (const anchor of anchorList) {
-        const item = await this.runItem(anchor.textContent)
-        .catch(e => logger.error(e) || this.runItem(anchor.textContent));
+        const Title = anchor.textContent.trim();
+        const item = await this.runItem(Title)
+        .catch(e => logger.error(e) || this.runItem(Title));
         if (item) {
           news.push(`<${anchor.href}|${item}>`);
           break;
@@ -52,15 +53,6 @@ export default class App {
   }
 
   async runItem(Title) {
-    const deny = [
-      'か$', 'も$', '語る', '\\?',
-      '熱中', '真夏', '猛暑', '関東',
-      '北朝鮮', '中国', 'ウクライナ', 'ロシア',
-      'ガザ',
-    ];
-    const title = Title.trim();
-    const isDeny = deny.filter(text => title.match(new RegExp(text))).length;
-    if (isDeny) return undefined;
     const { Item } = await ddbDoc.send(new GetCommand({
       TableName,
       Key: { Title },
@@ -103,14 +95,30 @@ export default class App {
     .filter(v => v.timestamp >= LIMIT);
     const titles = history.map(v => v.Title);
     const duplicate = this.hasDuplicate(Title, titles, 0.5);
-    const emergency = ['地震', '津波', '震度', '噴火', 'テロ', '大阪', '好適環境水', '寒波']
-    .filter(em => Title.match(em)).length !== 0;
-    history.push({ Title, timestamp: dayjs().unix(), duplicate, emergency });
+    const emergency = [
+      '地震', '津波', '震度', '噴火', 'テロ',
+      '洪水', '水害', '氾濫', '豪雨', '落雷',
+      '大阪', '好適環境水', '寒波',
+      '買収', '合併', '上場',
+    ].filter(em => Title.match(em)).length !== 0;
+    const deny = [
+      'か$', 'も$', '語る', '\\?',
+      '熱中', '真夏', '猛暑', '酷暑', '残暑', '関東',
+      '北朝鮮', '中国', 'ウクライナ', 'ロシア',
+      'ガザ', 'トランプ', '虚偽', '苦悩',
+      '報告', '調査', '監督', '解説', '判定', '要請',
+      'しない', '裏側', '発表', '公表', '非難', '表明',
+      '大谷', '妊娠', '出産', '結婚', '離婚', '再婚',
+    ].filter(text => Title.match(new RegExp(text))).length !== 0;
+    history.push({ Title, timestamp: dayjs().unix(), emergency, duplicate, deny });
     await ddbDoc.send(new PutCommand({
       TableName,
       Item: { Title: 'history', history },
     }));
-    if (!emergency && duplicate) return undefined;
+    if (!emergency) {
+      if (deny) return undefined;
+      if (duplicate) return undefined;
+    }
     return Title;
   }
 
