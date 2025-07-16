@@ -94,7 +94,7 @@ export default class App {
       }));
       return history;
     };
-    const LIMIT = dayjs().subtract(30, 'day').unix();
+    const LIMIT = dayjs().subtract(90, 'day').unix();
     const history = (await getHistory()
     .catch(e => {
       logger.warn(JSON.stringify(e));
@@ -102,13 +102,15 @@ export default class App {
     }))
     .filter(v => v.timestamp >= LIMIT);
     const titles = history.map(v => v.Title);
-    const duplicate = this.hasDuplicate(Title, titles, 0.3);
-    history.push({ Title, timestamp: dayjs().unix(), duplicate });
+    const duplicate = this.hasDuplicate(Title, titles, 0.5);
+    const emergency = ['地震', '津波', '震度', '噴火', 'テロ', '大阪', '好適環境水', '寒波']
+    .filter(em => Title.match(em)).length !== 0;
+    history.push({ Title, timestamp: dayjs().unix(), duplicate, emergency });
     await ddbDoc.send(new PutCommand({
       TableName,
       Item: { Title: 'history', history },
     }));
-    if (duplicate) return undefined;
+    if (!emergency && duplicate) return undefined;
     return Title;
   }
 
