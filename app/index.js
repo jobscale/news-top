@@ -99,7 +99,7 @@ export default class App {
       '地震', '津波', '震度', '噴火', 'テロ',
       '洪水', '水害', '氾濫', '豪雨', '落雷',
       '大阪', '好適環境水', '寒波',
-      '買収', '合併', '上場',
+      '買収', '合併', '上場', '原子',
     ].filter(em => Title.match(em)).length !== 0;
     const deny = [
       'か$', 'も$', '語る', '\\?',
@@ -109,6 +109,7 @@ export default class App {
       '報告', '調査', '監督', '解説', '判定', '要請',
       'しない', '裏側', '発表', '公表', '非難', '表明',
       '大谷', '妊娠', '出産', '結婚', '離婚', '再婚',
+      '選手', '球団', '野球', 'サッカー', '怪我', '故障',
     ].filter(text => Title.match(new RegExp(text))).length !== 0;
     history.push({ Title, timestamp: dayjs().unix(), emergency, duplicate, deny });
     await ddbDoc.send(new PutCommand({
