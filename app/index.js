@@ -122,6 +122,7 @@ export default class App {
       '首相', '参議院', '衆議院', '裁判', '猶予', '憲法', '議員', '知事',
       '訪問', '参拝', '慰問', '安保', 'ドラマ', '悪化', '激化', '復帰', '謹慎',
       '不審', '強化', '不妊', '相談', '思惑', '面会', '面談', '襲撃',
+      '記事', '記者', '報道',
     ].filter(text => Title.match(new RegExp(text))).length !== 0;
     history.push({ Title, timestamp: dayjs().unix(), emergency, duplicate, deny });
     await ddbDoc.send(new PutCommand({
