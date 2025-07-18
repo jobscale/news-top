@@ -110,6 +110,7 @@ export default class App {
       'しない', '裏側', '発表', '公表', '非難', '表明',
       '大谷', '妊娠', '出産', '結婚', '離婚', '再婚',
       '選手', '球団', '野球', 'サッカー', '怪我', '故障',
+      '抗議', '披露', '人気', '話題', 'スポーツ',
     ].filter(text => Title.match(new RegExp(text))).length !== 0;
     history.push({ Title, timestamp: dayjs().unix(), emergency, duplicate, deny });
     await ddbDoc.send(new PutCommand({
