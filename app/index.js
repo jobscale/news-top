@@ -113,6 +113,7 @@ export default class App {
       '大谷', '妊娠', '出産', '結婚', '離婚', '再婚', '選挙', '投票', '支持',
       '選手', '球団', '野球', 'サッカー', '怪我', '故障', '闘病',
       '抗議', '披露', '人気', '話題', 'スポーツ', '会話', '明かす',
+      '価格', '抵抗', '都心',
     ].filter(text => Title.match(new RegExp(text))).length !== 0;
     history.push({ Title, timestamp: dayjs().unix(), emergency, duplicate, deny });
     await ddbDoc.send(new PutCommand({
