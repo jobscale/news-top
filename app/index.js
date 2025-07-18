@@ -125,7 +125,8 @@ export default class App {
       '不審', '強化', '不妊', '相談', '思惑', '面会', '面談', '襲撃', '誘拐',
       '記事', '記者', '報道', '主演', '依存', '密輸', '密売', '殺人', '殺害',
       '安全', '危険', '過去', '未来', '評判', '不評', '優秀', '最高', '最悪',
-      '到着', '出国', '帰国', '帰宅', '選抜', '棄権', '断念', '中断',
+      '到着', '出国', '帰国', '帰宅', '選抜', '棄権', '断念', '中断', '試合',
+      'リベンジ',
     ].filter(text => Title.match(new RegExp(text))).length !== 0;
     history.push({ Title, timestamp: dayjs().unix(), emergency, duplicate, deny });
     await ddbDoc.send(new PutCommand({
