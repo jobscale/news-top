@@ -123,6 +123,7 @@ export default class App {
       '訪問', '参拝', '慰問', '安保', 'ドラマ', '悪化', '激化', '復帰', '謹慎',
       '不審', '強化', '不妊', '相談', '思惑', '面会', '面談', '襲撃', '誘拐',
       '記事', '記者', '報道', '主演', '依存', '密輸', '密売', '殺人', '殺害',
+      '安全', '危険', '過去', '未来', '評判', '不評', '優秀', '最高', '最悪',
     ].filter(text => Title.match(new RegExp(text))).length !== 0;
     history.push({ Title, timestamp: dayjs().unix(), emergency, duplicate, deny });
     await ddbDoc.send(new PutCommand({
