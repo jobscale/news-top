@@ -96,7 +96,7 @@ export default class App {
     const titles = history.map(v => v.Title);
     const duplicate = this.hasDuplicate(Title, titles, 0.5);
     const emergency = [
-      '地震', '津波', '震度', '噴火', 'テロ',
+      '地震', '津波', '震度', '噴火', 'テロ', '緊急',
       '洪水', '水害', '氾濫', '決壊', '豪雨', '落雷',
       '大阪', '好適環境水', '寒波', '障害', '停電', '断水',
       '買収', '合併', '上場', '株価', '為替', '原子',
@@ -129,7 +129,8 @@ export default class App {
       'リベンジ', '反響', '繁盛', '理由', '閉店', '倒産', '破産', '保護', '愛護',
       '満塁', '息子', '苦難', '三振', '連続', '苦境', '今後', '苦労', '母親', '負担',
       '参政', '当選', '体験', '予言', '混雑', '逆転', '始球', '通過', '全然',
-      'ゴルフ', '解散', '珍事', '敗北',
+      'ゴルフ', '解散', '珍事', '敗北', '連立', '裏目', '昏睡', '死亡', '任期',
+      '死球', '自民', '半数', '地元', '議席', '幹事', '公明', '幹部',
     ].filter(text => Title.match(new RegExp(text))).length !== 0;
     history.push({ Title, timestamp: dayjs().unix(), emergency, duplicate, deny });
     await ddbDoc.send(new PutCommand({
