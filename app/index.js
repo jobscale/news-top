@@ -129,7 +129,7 @@ export default class App {
       'リベンジ', '反響', '繁盛', '理由', '閉店', '倒産', '破産', '保護', '愛護',
       '満塁', '息子', '苦難', '三振', '連続', '苦境', '今後', '苦労', '母親', '負担',
       '参政', '当選', '体験', '予言', '混雑', '逆転', '始球', '通過', '全然',
-      'ゴルフ', '解散', '珍事',
+      'ゴルフ', '解散', '珍事', '敗北',
     ].filter(text => Title.match(new RegExp(text))).length !== 0;
     history.push({ Title, timestamp: dayjs().unix(), emergency, duplicate, deny });
     await ddbDoc.send(new PutCommand({
