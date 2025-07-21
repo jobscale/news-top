@@ -134,7 +134,7 @@ export default class App {
       '連日', '親子', '事故', '勝負', '後半', '前半', '連休', '関越', '予想',
       '男性', '暴力', '加害', '被害', '観客', '野党', '結束', '不透明', '与党', '行政',
       '巨人', '走者', '得点', '打者', '点差', '社民', '政党', '方針', '維持', '見通',
-      '婚活', '卒業', '速球', '球場', '長官',
+      '婚活', '卒業', '速球', '球場', '長官', '牛乳', '凱旋', '出場', '分間', '謝罪',
     ].filter(text => Title.match(new RegExp(text))).length !== 0;
     history.push({ Title, timestamp: dayjs().unix(), emergency, duplicate, deny });
     await ddbDoc.send(new PutCommand({
