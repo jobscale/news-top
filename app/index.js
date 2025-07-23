@@ -137,13 +137,14 @@ export default class App {
       '婚活', '卒業', '速球', '球場', '長官', '牛乳', '凱旋', '出場', '分間', '謝罪',
       '万票', '得票', '守護', '守備', '先行', '先制', '球宴', '後悔', '恐怖', '業者',
       '中盤', '感動', '大臣', '退任', '更迭', '遺憾', '先輩', '後輩', '忖度', '時間',
-      '被告', '起訴',
-    ].filter(text => Title.match(new RegExp(text))).length !== 0;
+      '被告', '起訴', '登場', '背景', '悪夢', '投手', '降板', '登板',
+    ].filter(text => Title.match(new RegExp(text))).length;
     history.push({ Title, timestamp: dayjs().unix(), emergency, duplicate, deny });
     await ddbDoc.send(new PutCommand({
       TableName,
       Item: { Title: 'history', history },
     }));
+    if (deny > 1) return undefined;
     if (!emergency) {
       if (deny) return undefined;
       if (duplicate) return undefined;
