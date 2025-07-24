@@ -7,6 +7,7 @@
     "news"
   ],
   "author": "jobscale <jobscale@users.noreply.github.com>",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "start": "TZ=Etc/GMT node .",
