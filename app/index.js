@@ -3,6 +3,7 @@ import { JSDOM } from 'jsdom';
 import { DynamoDBClient, CreateTableCommand } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
 import logger from '@jobscale/logger';
+import { dataset } from './dataset.js';
 import env from './env.js';
 
 const wait = ms => new Promise(resolve => { setTimeout(resolve, ms); });
@@ -41,8 +42,8 @@ export default class App {
       const news = [];
       for (const anchor of anchorList) {
         const Title = anchor.textContent.trim();
-        const item = await this.runItem(Title)
-        .catch(e => logger.error(e) || this.runItem(Title));
+        const item = await this.filterItem(Title)
+        .catch(e => logger.error(e) || this.filterItem(Title));
         if (item) {
           news.push(`<${anchor.href}|${item}>`);
           break;
@@ -52,7 +53,7 @@ export default class App {
     });
   }
 
-  async runItem(Title) {
+  async filterItem(Title) {
     const { Item } = await ddbDoc.send(new GetCommand({
       TableName,
       Key: { Title },
@@ -95,51 +96,13 @@ export default class App {
     .filter(v => v.timestamp >= LIMIT);
     const titles = history.map(v => v.Title);
     const duplicate = this.hasDuplicate(Title, titles, 0.5);
-    const emergency = [
-      '地震', '津波', '震度', '噴火', 'テロ', '緊急',
-      '洪水', '水害', '氾濫', '決壊', '豪雨', '落雷',
-      '大阪', '好適環境水', '寒波', '障害', '停電', '断水',
-      '買収', '合併', '上場', '株価', '為替', '原子',
-    ].filter(em => Title.match(em)).length !== 0;
-    const deny = [
-      'か$', 'も$', 'へ$', '今$', '思う', '語る', '明かす', 'しない', 'らぬ', 'らず', 'ぶり', '違う', '\\?',
-      '熱中', '真夏', '猛暑', '酷暑', '残暑', '関東', '都心', '都市', '悲しい', '嬉しい',
-      '北朝鮮', '中国', '韓国', 'ウクライナ', 'ロシア', 'ガザ', 'トランプ',
-      '空爆', '兵士', '民間', '役員', '不安', '努力', 'マニフェスト', '代表',
-      '虚偽', '苦悩', '死去', '追悼', '搬送', '入院', '退院', '危篤', '不明',
-      '報告', '調査', '監督', '解説', '判定', '要請', '無罪', '有罪', '判決',
-      '論点', 'リスク', '意向', '負け', '優勝', '勝利', '期限', '関税', '疑問',
-      '裏側', '発表', '公表', '非難', '表明', '棄却', '貿易', '急逝', '疑惑',
-      '大谷', '妊娠', '出産', '結婚', '離婚', '再婚', '選挙', '投票', '支持',
-      '選手', '球団', '野球', 'サッカー', 'バスケ', 'バレー', '卓球', '柔道',
-      'フェンシング', '剣道', 'ボクシング', 'カーリング', 'テニス', 'ラグビー',
-      'マラソン', '水泳', '陸上', 'ソフトボール', 'バドミントン', 'リタイア',
-      '怪我', '故障', '闘病', '対談', '責任', '決意', '決断', '決定', '未定', '祝儀',
-      '抗議', '披露', '人気', '話題', '流行', 'スポーツ', '会話', '会談', '会議',
-      '価格', '抵抗', '辞職', '辞任', '撤退', '病院', '病気', '再審', '審議', '天国',
-      '辞意', '引退', '横領', '着服', '疑い', '容疑', '賠償', '申告', '申請', '増量',
-      '国防', '防衛', '異議', '絶望', '歓喜', '証言', '旅行', '逃亡', '逃走', '減量',
-      '良性', '疾患', '医院', '委員', '応援', '負傷', '事実', '確認', '真相', '地獄',
-      '首相', '参議院', '参院', '衆議院', '裁判', '猶予', '憲法', '議員', '知事',
-      '訪問', '参拝', '慰問', '安保', 'ドラマ', '悪化', '激化', '復帰', '謹慎', '汚職',
-      '不審', '強化', '不妊', '相談', '思惑', '面会', '面談', '襲撃', '誘拐', '警護',
-      '記事', '記者', '報道', '主演', '依存', '密輸', '密売', '殺人', '殺害', '警備',
-      '安全', '危険', '過去', '未来', '評判', '不評', '優秀', '最高', '最悪', '準備',
-      '到着', '出国', '帰国', '帰宅', '選抜', '棄権', '断念', '中断', '試合', '用意',
-      'リベンジ', '反響', '繁盛', '理由', '閉店', '倒産', '破産', '保護', '愛護',
-      '満塁', '息子', '苦難', '三振', '連続', '苦境', '今後', '苦労', '母親', '負担',
-      '参政', '当選', '落選', '体験', '予言', '混雑', '逆転', '始球', '通過', '全然',
-      'ゴルフ', '解散', '珍事', '敗北', '連立', '裏目', '昏睡', '死亡', '任期', '攻撃',
-      '死球', '自民', '半数', '地元', '議席', '幹事', '公明', '幹部', '大会', '甲子園',
-      '連日', '親子', '事故', '勝負', '後半', '前半', '連休', '関越', '予想', '完投',
-      '男性', '暴力', '加害', '被害', '観客', '野党', '結束', '不透明', '与党', '行政',
-      '巨人', '走者', '得点', '打者', '点差', '社民', '政党', '方針', '維持', '見通',
-      '婚活', '卒業', '速球', '球場', '長官', '牛乳', '凱旋', '出場', '分間', '謝罪',
-      '万票', '得票', '守護', '守備', '先行', '先制', '球宴', '後悔', '恐怖', '業者',
-      '中盤', '感動', '大臣', '退任', '更迭', '遺憾', '先輩', '後輩', '忖度', '時間',
-      '被告', '起訴', '登場', '背景', '悪夢', '投手', '降板', '登板', '余命', '独身',
-    ].filter(text => Title.match(new RegExp(text))).length;
+    const emergency = dataset.emergency.filter(em => Title.match(em)).length;
+    const deny = dataset.deny.filter(text => Title.match(new RegExp(text))).length;
     history.push({ Title, timestamp: dayjs().unix(), emergency, duplicate, deny });
+    const ITEM_LIMIT = 400 * 1024;
+    while (
+      Buffer.byteLength(JSON.stringify({ Title: 'history', history }), 'utf8') >= ITEM_LIMIT
+    ) { history.shift(); }
     await ddbDoc.send(new PutCommand({
       TableName,
       Item: { Title: 'history', history },
