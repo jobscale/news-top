@@ -4,6 +4,7 @@ import { DynamoDBClient, CreateTableCommand } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
 import logger from '@jobscale/logger';
 import { dataset } from './dataset.js';
+import { calcScore } from './llm.js';
 import env from './env.js';
 
 const wait = ms => new Promise(resolve => { setTimeout(resolve, ms); });
@@ -75,6 +76,7 @@ export default class App {
       await wait(15000);
     });
     if (Item) return undefined;
+    const pro = calcScore(Title);
     await ddbDoc.send(new PutCommand({
       TableName,
       Item: { Title },
@@ -98,7 +100,10 @@ export default class App {
     const duplicate = this.hasDuplicate(Title, titles, 0.5);
     const emergency = dataset.emergency.filter(em => Title.match(em)).length;
     const deny = dataset.deny.filter(text => Title.match(new RegExp(text))).length;
-    history.push({ Title, timestamp: dayjs().unix(), emergency, duplicate, deny });
+    const score = await pro.then(llm => llm?.score).catch(e => logger.warn(e));
+    history.push({
+      Title, timestamp: dayjs().unix(), emergency, duplicate, deny, score,
+    });
     const ITEM_LIMIT = 400 * 1024;
     while (
       Buffer.byteLength(JSON.stringify({ Title: 'history', history }), 'utf8') >= ITEM_LIMIT
