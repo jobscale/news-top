@@ -100,9 +100,9 @@ export default class App {
     const duplicate = this.hasDuplicate(Title, titles, 0.5);
     const emergency = dataset.emergency.filter(em => Title.match(em)).length;
     const deny = dataset.deny.filter(text => Title.match(new RegExp(text))).length;
-    const score = await pro.then(llm => llm?.score).catch(e => logger.warn(e));
+    const { score, benchmark } = await pro.catch(e => logger.warn(e));
     history.push({
-      Title, timestamp: dayjs().unix(), emergency, duplicate, deny, score,
+      Title, timestamp: dayjs().unix(), emergency, duplicate, deny, score, benchmark,
     });
     const ITEM_LIMIT = 400 * 1024;
     while (
@@ -117,7 +117,7 @@ export default class App {
       if (deny) return undefined;
       if (duplicate) return undefined;
     }
-    return Title;
+    return `${Title} - score:${score} bench:${benchmark}`;
   }
 
   hasDuplicate(target, titles, threshold = 0.5) {

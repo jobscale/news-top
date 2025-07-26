@@ -37,19 +37,18 @@ const llmFetch = async content => {
 };
 
 export const calcScore = async title => {
+  const start = Date.now();
   const content = `${question}\n\nTitle: ${title}`;
   return llmFetch({
     model: 'gemma-3-4b-it',
-    messages: [
-      { role: 'user', content },
-    ],
+    messages: [{ role: 'user', content }],
     temperature: 0.6,
     max_tokens: 128,
   })
   .then(res => {
     const answer = JSON.parse((res?.choices ?? [])[0]?.message?.content ?? '{"ok":false}');
     logger.info(JSON.stringify({ title, answer }));
-    return answer;
+    return { ...answer, benchmark: (Date.now() - start) / 1000 };
   })
   .catch(e => logger.warn(e) ?? {});
 };
