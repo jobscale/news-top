@@ -15,6 +15,7 @@ module.exports = {
     }],
     'no-restricted-syntax': 'off',
     'import/extensions': 'off',
+    'arrow-body-style': 'off',
   },
   env: {
     node: true,
