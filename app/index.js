@@ -112,6 +112,7 @@ export default class App {
       TableName,
       Item: { Title: 'history', history },
     }));
+    if (Number.isInteger(score) && score < 10) return undefined;
     if (deny > 1) return undefined;
     if (!emergency) {
       if (deny) return undefined;
