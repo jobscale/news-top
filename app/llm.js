@@ -32,10 +32,10 @@ const endpoint = [
   'http://127.0.0.1:1234/v1/chat/completions',
   'http://172.16.6.77:2880/v1/chat/completions',
   'https://llama.x.jsx.jp/v1/chat/completions',
-][0];
+][2];
 
 const llmFetch = async content => {
-  const res = await fetch(endpoint[2], {
+  const res = await fetch(endpoint, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(content),
