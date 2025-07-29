@@ -34,12 +34,6 @@ class App {
     }
   }
 
-  fetch(uri, ts) {
-    return news.fetch(uri)
-    .then(rows => logger.info(JSON.stringify({ ts, uri, rows })) || rows)
-    .catch(e => logger.error({ e, uri }) || []);
-  }
-
   async amz(ts) {
     return news.amz(amz, ts)
     .then(priseList => {
@@ -57,11 +51,15 @@ class App {
     const ts = `${hh}:${mm}`;
     const rows = [];
     for (const uri of list) {
-      const items = await this.fetch(uri, ts);
+      const items = await news.yahoo(uri);
       if (items.length) {
         rows.push(...items);
         break;
       }
+    }
+    if (!rows.length) {
+      const items = await news.asahi();
+      if (items.length) rows.push(...items);
     }
     await this.post(rows);
     if (ts >= '12:00' && ts <= '12:10') {

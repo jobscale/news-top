@@ -25,7 +25,7 @@ const ddb = new DynamoDBClient({
 const ddbDoc = new DynamoDBDocumentClient(ddb);
 
 export default class App {
-  fetch(uri) {
+  yahoo(uri) {
     return fetch(uri, {
       headers: {
         'accept-language': 'ja',
@@ -111,10 +111,10 @@ export default class App {
       TableName,
       Item: { Title: 'history', history },
     }));
+    if (duplicate) return undefined;
     if (deny > 1) return undefined;
     if (!emergency) {
       if (deny) return undefined;
-      if (duplicate) return undefined;
       if (Number.isInteger(score) && score < 10) return undefined;
     }
     return `${Title} - score:${score} bench:${benchmark}`;
@@ -141,6 +141,30 @@ export default class App {
     }
     const maxLength = Math.max(setA.length, b.length);
     return match / maxLength; // 一致率
+  }
+
+  async asahi() {
+    const baseUrl = 'https://news.tv-asahi.co.jp';
+    return fetch(`${baseUrl}/api/lchara_list.php?appcode=n4tAMkmEnY&page=0001`, {
+      headers: {
+        'accept-language': 'ja',
+        'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+      },
+    })
+    .then(res => res.json())
+    .then(async res => {
+      for (const item of res.item || []) {
+        const title = await this.filterItem(item.title);
+        if (title) {
+          return [`<${baseUrl}${item.link}|${title}>`];
+        }
+      }
+      return [];
+    })
+    .catch(logger.warn)
+    .then(res => {
+      return res || [];
+    });
   }
 
   async amz(list, ts) {

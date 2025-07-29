@@ -7,6 +7,10 @@ export const list = [
   // 'https://news.yahoo.co.jp/categories/science',
 ];
 
+export const nikkei = [
+  'https://www.nikkei.com/news/category/',
+];
+
 export const amz = [
   { name: 'DICE BANK MBK ', sale: 17000, uri: 'https://www.amazon.co.jp/gp/product/B0C4THDKMD' },
   { name: 'DICE BANK CAMO', sale: 17000, uri: 'https://www.amazon.co.jp/gp/product/B0C4THSTS1' },
