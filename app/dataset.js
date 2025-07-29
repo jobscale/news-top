@@ -130,4 +130,11 @@ export const dataset = {
   deny: Object.values(detail).flat(),
 };
 
+export const filter = Title => {
+  return {
+    emergency: dataset.emergency.filter(em => Title.match(em)).length,
+    deny: dataset.deny.filter(text => Title.match(new RegExp(text))).length,
+  };
+};
+
 export default dataset;

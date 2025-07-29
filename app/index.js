@@ -3,7 +3,7 @@ import { JSDOM } from 'jsdom';
 import { DynamoDBClient, CreateTableCommand } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
 import logger from '@jobscale/logger';
-import { dataset } from './dataset.js';
+import { filter } from './dataset.js';
 import { calcScore } from './llm.js';
 import env from './env.js';
 
@@ -98,8 +98,7 @@ export default class App {
     .filter(v => v.timestamp >= LIMIT);
     const titles = history.map(v => v.Title);
     const duplicate = this.hasDuplicate(Title, titles, 0.5);
-    const emergency = dataset.emergency.filter(em => Title.match(em)).length;
-    const deny = dataset.deny.filter(text => Title.match(new RegExp(text))).length;
+    const { emergency, deny } = filter(Title);
     const { score, benchmark } = await pro.catch(e => logger.warn(e));
     history.push({
       Title, timestamp: dayjs().unix(), emergency, duplicate, deny, score, benchmark,
