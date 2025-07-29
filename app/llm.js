@@ -28,8 +28,14 @@ const question = `次のニュースタイトルを「社会的な重要性」�
 - 説明や理由は不要です。
 `;
 
+const endpoint = [
+  'http://127.0.0.1:1234/v1/chat/completions',
+  'http://172.16.6.77:2880/v1/chat/completions',
+  'https://llama.x.jsx.jp/v1/chat/completions',
+][0];
+
 const llmFetch = async content => {
-  const res = await fetch('https://llama.x.jsx.jp/v1/chat/completions', {
+  const res = await fetch(endpoint[2], {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(content),

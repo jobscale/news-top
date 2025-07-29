@@ -73,7 +73,7 @@ export default class App {
           KeyType: 'HASH',
         }],
       }));
-      await wait(15000);
+      await wait(5000);
     });
     if (Item) return undefined;
     const pro = calcScore(Title);
