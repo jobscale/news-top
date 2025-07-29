@@ -24,7 +24,7 @@ const question = `次のニュースタイトルを「社会的な重要性」�
   - 気候変動による地球規模の問題
   - 大阪や関西に関する情報（スポーツ関連や政治関連は除く）
 - 後日談や関係者の取材は評価を低くしてください。
-- 回答は {"score":数値} のJSON形式で出力し、コードブロックや Markdown にしないでください。
+- 回答は {"score":数値} のJSON形式で出力し、Markdown やコードブロックは不要です。
 - 説明や理由は不要です。
 `;
 
@@ -54,8 +54,12 @@ export const calcScore = async title => {
   })
   .then(res => {
     const answer = res.choices[0].message.content;
-    logger.info(JSON.stringify({ title, answer }));
-    return JSON.parse(answer);
+    // logger.info(JSON.stringify({ title, answer }));
+    return (async () => JSON.parse(answer))()
+    .catch(e => {
+      logger.warn(e, { answer });
+      return {};
+    });
   })
   .catch(e => logger.warn(e) ?? {})
   .then(answer => {
