@@ -40,17 +40,15 @@ export default class App {
       return anchorList;
     })
     .then(async anchorList => {
-      const news = [];
       for (const anchor of anchorList) {
         const Title = anchor.textContent.trim();
-        const item = await this.filterItem(Title)
+        const title = await this.filterItem(Title)
         .catch(e => logger.error(e) || this.filterItem(Title));
-        if (item) {
-          news.push(`<${anchor.href}|${item}>`);
-          break;
+        if (title) {
+          return [`<${anchor.href}|${title}> Y`];
         }
       }
-      return news;
+      return [];
     });
   }
 
@@ -154,16 +152,13 @@ export default class App {
     .then(res => res.json())
     .then(async res => {
       for (const item of res.item || []) {
-        const title = await this.filterItem(item.title);
+        const title = await this.filterItem(item.title)
+        .catch(e => logger.error(e) || this.filterItem(item.title));
         if (title) {
-          return [`<${baseUrl}${item.link}|${title}>`];
+          return [`<${baseUrl}${item.link}|${title}> A`];
         }
       }
       return [];
-    })
-    .catch(logger.warn)
-    .then(res => {
-      return res || [];
     });
   }
 
