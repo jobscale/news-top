@@ -113,7 +113,7 @@ export default class App {
     if (deny > 1) return undefined;
     if (!emergency) {
       if (deny) return undefined;
-      if (Number.isInteger(score) && score < 10) return undefined;
+      if (Number.isInteger(score) && score < 7) return undefined;
     }
     return `${Title} - score:${score} bench:${benchmark}`;
   }
