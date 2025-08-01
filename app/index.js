@@ -2,11 +2,12 @@ import dayjs from 'dayjs';
 import { JSDOM } from 'jsdom';
 import { DynamoDBClient, CreateTableCommand } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
-import logger from '@jobscale/logger';
+import { Logger } from '@jobscale/logger';
 import { filter } from './dataset.js';
 import { calcScore } from './llm.js';
 import env from './env.js';
 
+const logger = new Logger({ noPathName: true });
 const wait = ms => new Promise(resolve => { setTimeout(resolve, ms); });
 const toNumber = num => num.toLocaleString();
 const auth = JSON.parse(Buffer.from(env.auth, 'base64').toString());
@@ -24,7 +25,7 @@ const ddb = new DynamoDBClient({
 });
 const ddbDoc = new DynamoDBDocumentClient(ddb);
 
-export default class App {
+export class App {
   yahoo(uri) {
     return fetch(uri, {
       headers: {
@@ -97,9 +98,9 @@ export default class App {
     const titles = history.map(v => v.Title);
     const duplicate = this.hasDuplicate(Title, titles, 0.5);
     const { emergency, deny } = filter(Title);
-    const { score, benchmark } = await pro.catch(e => logger.warn(e));
+    const ai = await pro.catch(e => logger.warn(e));
     history.push({
-      Title, timestamp: dayjs().unix(), emergency, duplicate, deny, score, benchmark,
+      ...ai, Title, timestamp: dayjs().unix(), emergency, duplicate, deny,
     });
     const ITEM_LIMIT = 400 * 1024;
     while (
@@ -113,9 +114,9 @@ export default class App {
     if (deny > 1) return undefined;
     if (!emergency) {
       if (deny) return undefined;
-      if (Number.isInteger(score) && score < 5) return undefined;
+      if (Number.isInteger(ai.score) && ai.score < 5) return undefined;
     }
-    return `${Title} - score:${score} bench:${benchmark}`;
+    return `${Title} - score:${ai.score} bench:${ai.benchmark}`;
   }
 
   hasDuplicate(target, titles, threshold = 0.5) {
@@ -196,3 +197,4 @@ export default class App {
 }
 
 export const app = new App();
+export default { App, app };
