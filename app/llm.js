@@ -24,7 +24,7 @@ const question = `以下のニュースに対して、影響度に応じて1〜1
 - 気候や災害による経済・産業への重大な影響（スコア9〜10）
 
 回答は JSON 形式で出力してください。
-{"score":正の整数,"location":"地理的影響範囲","influence":"影響範囲"}
+{"score":正の整数,"location":["地理的影響範囲"],"influence":["影響範囲"]}
 - 地理的影響範囲の例：北米|北東アジア|国内|中東|北欧|ヨーロッパ|ニューヨーク|オタワ|ヘルシンキ|大阪市|渋谷区|東京都|大阪府|北欧|地域|個人
 - 影響範囲の例：生命|怪我|疾患|患者|建物|産業|株価|経済|歴史|未来|地球|快方|好転|縮小|犯罪|芸能|スポーツ|エンタメ|政治|個人
 説明や理由やは不要です。
@@ -49,7 +49,7 @@ export const calcScore = async title => {
     max_tokens: 64,
   })
   .then(res => {
-    if (DEBUG) logger.info(JSON.stringify({ title, message: res.choices[0].message.content }));
+    if (DEBUG) logger.info('\n\n', JSON.stringify({ title, message: res.choices[0].message.content }));
     const match = res.choices[0].message.content.match(/\{[\s\S]*?\}/);
     const answer = match ? match[0] : '{}';
     return (async () => JSON.parse(answer))()
