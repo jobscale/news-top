@@ -8,7 +8,7 @@ const server = servers[LLAMA || 'prod'];
 
 const question = `以下のニュースに対して、影響度に応じて1〜10のスコアを付けてください。
 スコアは以下の基準に従ってください：
-- 1〜2：芸能・スポーツ・エンタメ・政治・個人・受刑者・遺族・冠婚葬祭
+- 1〜2：芸能・スポーツ・エンタメ・政治・個人・犯罪・受刑者・遺族・冠婚葬祭
 - 3〜4：事件・事故・地域災害
 - 5〜6：経済・社会・文化
 - 7〜8：世界規模・国内全域規模のインフラ障害
@@ -16,17 +16,15 @@ const question = `以下のニュースに対して、影響度に応じて1〜1
 
 以下のような話題はスコアを下げてください：
 - 歴史的な出来事、過去の話題は低評価（スコア1〜2）
-- 未来の予定・構想・計画は低評価（スコア4 〜 -5）
+- 未来の予定・構想・計画は低評価（スコア1 〜 -2）
 - 未確認・不確定・計画中・賛否は低評価（スコア1〜2）
 - 否定的な話題、抽象的な話題は低評価（スコア1〜2）
-- 病気、怪我、疾患、治療、入退院は低評価（スコア1〜2）
-- 気候による経済・産業への影響は影響度高（スコア9〜10）
+- 病気、怪我、疾患、患者、治療、入退院は低評価（スコア1〜2）
+- 気候や災害による経済・産業への影響は影響度高（スコア9〜10）
 回答は JSON 形式で出力してください。
-{
-"score":正の整数,
-"location":"(地理的影響範囲、次のうち複数) 北米|北東アジア|国内|ニューヨーク|オタワ|ヘルシンキ|大阪市|渋谷区|東京都|大阪府|北欧|地域|個人",
-"influence":(影響範囲、次のうち複数) 生命|怪我|疾患|建物|産業|株価|経済|歴史|未来|地球|芸能|スポーツ|エンタメ|政治|個人"
-}
+{"score":正の整数,
+"location":"(地理的影響範囲、次のうち複数) 北米|北東アジア|国内|中東|北欧|ヨーロッパ|ニューヨーク|オタワ|ヘルシンキ|大阪市|渋谷区|東京都|大阪府|北欧|地域|個人",
+"influence":"(影響範囲、次のうち複数) 生命|怪我|疾患|患者|建物|産業|株価|経済|歴史|未来|地球|犯罪|芸能|スポーツ|エンタメ|政治|個人"}
 説明や理由やは不要です。
 `;
 
@@ -45,7 +43,7 @@ export const calcScore = async title => {
   return llmFetch({
     model: server.model,
     messages: [{ role: 'user', content }],
-    temperature: 0.6,
+    temperature: 0.4,
     max_tokens: 64,
   })
   .then(res => {
@@ -60,10 +58,10 @@ export const calcScore = async title => {
   })
   .catch(e => logger.warn(e) ?? {})
   .then(answer => {
-    const lowWord = ['芸能', 'スポーツ', 'エンタメ', '政治', '個人'];
+    const lowWord = ['芸能', 'スポーツ', 'エンタメ', '政治', '個人', '犯罪'];
     const minus = (
-      lowWord.find(word => answer.location?.match(word))
-    || lowWord.find(word => answer.influence?.match(word))
+      lowWord.find(word => answer.location?.includes(word))
+    || lowWord.find(word => answer.influence?.includes(word))
     ) ? 5 : 0;
     return {
       ...answer,

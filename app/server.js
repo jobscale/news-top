@@ -19,7 +19,7 @@ export const servers = {
     endpoint: 'http://127.0.0.1:2881/v1/chat/completions',
     model: 'Phi-4-mini-reasoning',
   },
-  'local-calma2': {
+  'local-calm2': {
     endpoint: 'http://127.0.0.1:2882/v1/chat/completions',
     model: 'calm2-7B-chat',
   },
