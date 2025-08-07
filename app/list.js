@@ -12,6 +12,7 @@ export const nikkei = [
 ];
 
 export const amz = [
+  { name: 'DICE BANK MAG ', sale: 17000, uri: 'https://www.amazon.co.jp/gp/product/B0D8W172JS' },
   { name: 'DICE BANK MBK ', sale: 17000, uri: 'https://www.amazon.co.jp/gp/product/B0C4THDKMD' },
   { name: 'DICE BANK CAMO', sale: 17000, uri: 'https://www.amazon.co.jp/gp/product/B0C4THSTS1' },
   { name: 'DICE BANK DMSM', sale: 17000, uri: 'https://www.amazon.co.jp/gp/product/B0C4TJ6YBB' },

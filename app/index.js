@@ -53,6 +53,27 @@ export class App {
     });
   }
 
+  asahi() {
+    const baseUrl = 'https://news.tv-asahi.co.jp';
+    return fetch(`${baseUrl}/api/lchara_list.php?appcode=n4tAMkmEnY&page=0001`, {
+      headers: {
+        'accept-language': 'ja',
+        'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+      },
+    })
+    .then(res => res.json())
+    .then(async res => {
+      for (const item of res.item || []) {
+        const title = await this.filterItem(item.title)
+        .catch(e => logger.error(e) || this.filterItem(item.title));
+        if (title) {
+          return [`<${baseUrl}${item.link}|${title}> A`];
+        }
+      }
+      return [];
+    });
+  }
+
   async filterItem(Title) {
     const { Item } = await ddbDoc.send(new GetCommand({
       TableName,
@@ -140,27 +161,6 @@ export class App {
     }
     const maxLength = Math.max(setA.length, b.length);
     return match / maxLength; // 一致率
-  }
-
-  async asahi() {
-    const baseUrl = 'https://news.tv-asahi.co.jp';
-    return fetch(`${baseUrl}/api/lchara_list.php?appcode=n4tAMkmEnY&page=0001`, {
-      headers: {
-        'accept-language': 'ja',
-        'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-      },
-    })
-    .then(res => res.json())
-    .then(async res => {
-      for (const item of res.item || []) {
-        const title = await this.filterItem(item.title)
-        .catch(e => logger.error(e) || this.filterItem(item.title));
-        if (title) {
-          return [`<${baseUrl}${item.link}|${title}> A`];
-        }
-      }
-      return [];
-    });
   }
 
   async amz(list, ts) {
