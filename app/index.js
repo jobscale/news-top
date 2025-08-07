@@ -132,9 +132,9 @@ export class App {
       Item: { Title: 'history', history },
     }));
     if (duplicate) return undefined;
-    if (deny > 1) return undefined;
-    if (!emergency) {
-      if (deny) return undefined;
+    if (deny.length > 1) return undefined;
+    if (!emergency.length) {
+      if (deny.length) return undefined;
       if (Number.isInteger(ai.score) && ai.score < 5) return undefined;
     }
     return `${Title} - score:${ai.score} bench:${ai.benchmark}`;

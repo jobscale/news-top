@@ -141,8 +141,8 @@ export const dataset = {
 
 export const filter = Title => {
   return {
-    emergency: dataset.emergency.filter(em => Title.match(em)).length,
-    deny: dataset.deny.filter(text => Title.match(new RegExp(text))).length,
+    emergency: dataset.emergency.filter(em => Title.match(em)),
+    deny: dataset.deny.filter(text => Title.match(new RegExp(text))),
   };
 };
 
