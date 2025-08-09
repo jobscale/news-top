@@ -135,9 +135,9 @@ export class App {
     if (deny.length > 1) return undefined;
     if (!emergency.length) {
       if (deny.length) return undefined;
-      if (Number.isInteger(ai.score) && ai.score < 5) return undefined;
+      if (Number.isInteger(ai.summary) && ai.summary < 5) return undefined;
     }
-    return `${Title} - score:${ai.score} bench:${ai.benchmark}`;
+    return `${Title} - ${JSON.stringify({ ...ai, title: undefined })}`;
   }
 
   hasDuplicate(target, titles, threshold = 0.5) {
