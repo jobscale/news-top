@@ -26,19 +26,19 @@ export const servers = {
   },
 
   'dark-gemma-3n-E4B-Q5': {
-    endpoint: 'http://dark.jsx.jp:2880/v1/chat/completions',
+    endpoint: 'http://172.16.6.77:2880/v1/chat/completions',
     model: 'Gemma-3n-E4B-it',
   },
   'dark-gemma-3n-E4B-Q4': {
-    endpoint: 'http://dark.jsx.jp:2881/v1/chat/completions',
+    endpoint: 'http://172.16.6.77:2881/v1/chat/completions',
     model: 'Gemma-3n-E4B-it',
   },
   'dark-gemma-3n-E2B-Q5': {
-    endpoint: 'http://dark.jsx.jp:2882/v1/chat/completions',
+    endpoint: 'http://172.16.6.77:2882/v1/chat/completions',
     model: 'Gemma-3n-E2B-it',
   },
   'dark-gemma-3n-E2B-Q4': {
-    endpoint: 'http://dark.jsx.jp:2883/v1/chat/completions',
+    endpoint: 'http://172.16.6.77:2883/v1/chat/completions',
     model: 'Gemma-3n-E2B-it',
   },
 
