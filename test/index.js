@@ -1,0 +1,30 @@
+import { fileURLToPath } from 'url';
+import path from 'path';
+import { readFile } from 'fs/promises';
+import { calcScore } from '../app/llm.js';
+
+const filepath = fileURLToPath(import.meta.url);
+const dirname = path.dirname(filepath);
+
+const logger = console;
+
+const main = async () => {
+  const titleList = await readFile(path.join(dirname, 'news.txt'), 'utf8')
+  .then(res => res.split('\n').filter(item => item));
+  for (const title of titleList) {
+    const res = await calcScore(title);
+    logger.info(JSON.stringify({ title, ...res }));
+  }
+};
+
+process.on('uncaughtException', e => {
+  logger.error('Uncaught Exception', { e: e.toString() });
+  process.exit(1);
+});
+
+process.on('unhandledRejection', reason => {
+  logger.error('Unhandled Rejection', { reason: reason.toString() });
+  process.exit(1);
+});
+
+main();
