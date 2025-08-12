@@ -133,9 +133,10 @@ export class App {
     }));
     if (duplicate) return undefined;
     if (deny.length > 1) return undefined;
-    if (!emergency.length) {
+    const score = ai.summary || 10;
+    if (score <= 4) return undefined;
+    if (!emergency.length && score <= 6) {
       if (deny.length) return undefined;
-      if (Number.isInteger(ai.summary) && ai.summary < 5) return undefined;
     }
     return `${Title} - ${JSON.stringify({ ...ai, title: undefined })}`;
   }
