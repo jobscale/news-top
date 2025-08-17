@@ -138,7 +138,7 @@ export class App {
     if (!emergency.length && score <= 6) {
       if (deny.length) return undefined;
     }
-    return `${Title} - ${JSON.stringify({ ...ai, title: undefined })}`;
+    return `${Title} - ${JSON.stringify({ ...ai, title: undefined }, null, 2)}`;
   }
 
   hasDuplicate(target, titles, threshold = 0.5) {

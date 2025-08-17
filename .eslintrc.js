@@ -16,6 +16,7 @@ module.exports = {
     'no-restricted-syntax': 'off',
     'import/extensions': 'off',
     'arrow-body-style': 'off',
+    'no-param-reassign': 'off',
   },
   env: {
     node: true,

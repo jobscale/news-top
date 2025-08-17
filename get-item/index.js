@@ -21,10 +21,10 @@ const run = async () => {
   if (!item) return;
 
   const filtered = item.history
-  // .filter(entry => Number.isInteger(entry?.score) && entry.score >= 5)
+  .filter(entry => Number.isInteger(entry?.score) && entry.score >= 7)
   // .filter(entry => !entry?.deny)
   // .filter(entry => entry?.emergency)
-  .slice(-100);
+  .slice(-30);
 
   logger.info(JSON.stringify(filtered, null, 2));
 };
