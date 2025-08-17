@@ -65,14 +65,14 @@ export const calcScore = async title => {
         if (isSeen) return false;
         seen.add(item);
         if (!title.includes(item)) {
-          logger.error(item, key, JSON.stringify({ title, ...answer }));
+          logger.error([item], key, JSON.stringify({ title, ...answer }));
           return false;
         }
         return true;
       });
     });
     if (answer.how.length) {
-      logger.error(answer.how, JSON.stringify({ title, ...answer }));
+      logger.error(answer.how, 'how', JSON.stringify({ title, ...answer }));
       answer.how = [];
     }
 
