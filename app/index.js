@@ -5,6 +5,7 @@ import { DynamoDBDocumentClient, PutCommand, GetCommand } from '@aws-sdk/lib-dyn
 import { Logger } from '@jobscale/logger';
 import { filter } from './dataset.js';
 import { calcScore } from './llm.js';
+import { calcScore as calc5w1h } from './llm-ex.js';
 import env from './env.js';
 
 const logger = new Logger({ noPathName: true });
@@ -119,7 +120,8 @@ export class App {
     const titles = history.map(v => v.Title);
     const duplicate = this.hasDuplicate(Title, titles, 0.5);
     const { emergency, deny } = filter(Title);
-    const ai = await pro.catch(e => logger.warn(e));
+    const scoreBase = await pro.catch(e => logger.warn(e));
+    const ai = { ...scoreBase, ...await calc5w1h(Title) };
     history.push({
       ...ai, Title, timestamp: dayjs().unix(), emergency, duplicate, deny,
     });
