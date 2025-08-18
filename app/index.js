@@ -43,10 +43,10 @@ export class App {
     .then(async anchorList => {
       for (const anchor of anchorList) {
         const Title = anchor.textContent.trim();
-        const title = await this.filterItem(Title)
+        const [score, title] = await this.filterItem(Title)
         .catch(e => logger.error(e) || this.filterItem(Title));
         if (title) {
-          return [`<${anchor.href}|${title}> Y`];
+          return [`<${anchor.href}|${title}> Y ${score}`];
         }
       }
       return [];
@@ -64,10 +64,10 @@ export class App {
     .then(res => res.json())
     .then(async res => {
       for (const item of res.item || []) {
-        const title = await this.filterItem(item.title)
+        const [score, title] = await this.filterItem(item.title)
         .catch(e => logger.error(e) || this.filterItem(item.title));
         if (title) {
-          return [`<${baseUrl}${item.link}|${title}> A`];
+          return [`<${baseUrl}${item.link}|${title}> A ${score}`];
         }
       }
       return [];
@@ -95,7 +95,7 @@ export class App {
       }));
       await wait(5000);
     });
-    if (Item) return undefined;
+    if (Item) return [];
     await ddbDoc.send(new PutCommand({
       TableName,
       Item: { Title },
@@ -122,6 +122,7 @@ export class App {
     history.push({
       ...ai, Title, timestamp: dayjs().unix(), emergency, duplicate, deny,
     });
+    const score = JSON.stringify({ ...ai, title: undefined }, null, 2);
     const ITEM_LIMIT = 400 * 1024;
     while (
       Buffer.byteLength(JSON.stringify({ Title: 'history', history }), 'utf8') >= ITEM_LIMIT
@@ -130,13 +131,13 @@ export class App {
       TableName,
       Item: { Title: 'history', history },
     }));
-    if (duplicate) return undefined;
-    if (deny.length > 1) return undefined;
-    if (ai.score < 3) return undefined;
+    if (duplicate) return [score];
+    if (deny.length > 1) return [score];
+    if (ai.score < 3) return [score];
     if (!emergency.length && ai.score < 4) {
-      if (deny.length) return undefined;
+      if (deny.length) return [score];
     }
-    return `${Title} - ${JSON.stringify({ ...ai, title: undefined }, null, 2)}`;
+    return [score, Title];
   }
 
   hasDuplicate(target, titles, threshold = 0.5) {

@@ -51,14 +51,14 @@ class App {
     const ts = `${hh}:${mm}`;
     const rows = [];
     for (const uri of list) {
-      const items = await news.yahoo(uri);
+      const items = await news.yahoo(uri).catch(e => logger.error(e) || []);
       if (items.length) {
         rows.push(...items);
         break;
       }
     }
     if (!rows.length) {
-      const items = await news.asahi();
+      const items = await news.asahi().catch(e => logger.error(e) || []);
       if (items.length) rows.push(...items);
     }
     await this.post(rows);

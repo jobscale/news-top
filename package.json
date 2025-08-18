@@ -9,7 +9,7 @@
   "author": "jobscale <jobscale@users.noreply.github.com>",
   "main": "index.js",
   "scripts": {
-    "start": "TZ=Etc/GMT node .",
+    "start": "TZ=Etc/GMT node --experimental-default-type=module index.js",
     "lint": "eslint .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
