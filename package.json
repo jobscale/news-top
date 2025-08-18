@@ -9,15 +9,16 @@
   "author": "jobscale <jobscale@users.noreply.github.com>",
   "main": "index.js",
   "scripts": {
-    "start": "TZ=Etc/GMT node --experimental-default-type=module index.js",
+    "start": "TZ=Etc/GMT bash vv",
     "lint": "eslint .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test",
+    "cronjob": "node ."
   },
   "license": "MIT",
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.828.0",
     "@aws-sdk/lib-dynamodb": "^3.828.0",
-    "@jobscale/logger": "^0.7.0",
+    "@jobscale/logger": "^0.8.1",
     "dayjs": "^1.11.13",
     "jsdom": "^26.1.0"
   },

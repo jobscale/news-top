@@ -1,18 +1,19 @@
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { readFile } from 'fs/promises';
+import { createLogger } from '@jobscale/logger';
 import { aiCalc } from '../app/llm.js';
 
 const filepath = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filepath);
 
-const logger = console;
+const logger = createLogger('info', { noPathName: true, noType: true });
 
 const main = async () => {
   const titleList = await readFile(path.join(dirname, 'news.txt'), 'utf8')
   .then(res => res.split('\n').filter(item => item));
   for (const title of titleList) {
-    const ai = await aiCalc(title);
+    const ai = await aiCalc(title).catch(e => logger.warn(e) || {});
     logger.info(JSON.stringify({ title, ...ai }));
   }
 };
