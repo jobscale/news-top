@@ -132,11 +132,11 @@ export class App {
       Item: { Title: 'history', history },
     }));
     if (duplicate) return [score];
-    if (deny.length > 1) return [score];
-    if (ai.score < 3) return [score];
-    if (!emergency.length && ai.score < 4) {
-      if (deny.length) return [score];
-    }
+    // if (deny.length > 1) return [score];
+    // if (ai.score < 3) return [score];
+    // if (!emergency.length && ai.score < 4) {
+    //   if (deny.length) return [score];
+    // }
     return [score, Title];
   }
 
