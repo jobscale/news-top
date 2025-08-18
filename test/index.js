@@ -1,8 +1,7 @@
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { readFile } from 'fs/promises';
-import { calcScore } from '../app/llm.js';
-import { calcScore as calc5w1h } from '../app/llm-ex.js';
+import { aiCalc } from '../app/llm.js';
 
 const filepath = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filepath);
@@ -13,9 +12,8 @@ const main = async () => {
   const titleList = await readFile(path.join(dirname, 'news.txt'), 'utf8')
   .then(res => res.split('\n').filter(item => item));
   for (const title of titleList) {
-    const res = await calcScore(title);
-    const res5w1h = await calc5w1h(title);
-    logger.info(JSON.stringify({ title, ...res, ...res5w1h }));
+    const ai = await aiCalc(title);
+    logger.info(JSON.stringify({ title, ...ai }));
   }
 };
 

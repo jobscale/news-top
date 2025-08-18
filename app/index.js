@@ -4,8 +4,7 @@ import { DynamoDBClient, CreateTableCommand } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
 import { Logger } from '@jobscale/logger';
 import { filter } from './dataset.js';
-import { calcScore } from './llm.js';
-import { calcScore as calc5w1h } from './llm-ex.js';
+import { aiCalc } from './llm.js';
 import env from './env.js';
 
 const logger = new Logger({ noPathName: true });
@@ -97,7 +96,6 @@ export class App {
       await wait(5000);
     });
     if (Item) return undefined;
-    const pro = calcScore(Title);
     await ddbDoc.send(new PutCommand({
       TableName,
       Item: { Title },
@@ -120,8 +118,7 @@ export class App {
     const titles = history.map(v => v.Title);
     const duplicate = this.hasDuplicate(Title, titles, 0.5);
     const { emergency, deny } = filter(Title);
-    const scoreBase = await pro.catch(e => logger.warn(e));
-    const ai = { ...scoreBase, ...await calc5w1h(Title) };
+    const ai = await aiCalc(Title);
     history.push({
       ...ai, Title, timestamp: dayjs().unix(), emergency, duplicate, deny,
     });
@@ -135,9 +132,8 @@ export class App {
     }));
     if (duplicate) return undefined;
     if (deny.length > 1) return undefined;
-    const score = ai.summary || 10;
-    if (score <= 4) return undefined;
-    if (!emergency.length && score <= 6) {
+    if (ai.score < 3) return undefined;
+    if (!emergency.length && ai.score < 4) {
       if (deny.length) return undefined;
     }
     return `${Title} - ${JSON.stringify({ ...ai, title: undefined }, null, 2)}`;

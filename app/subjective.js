@@ -76,13 +76,14 @@ export const calcScore = async title => {
       answer.how = [];
     }
 
-    const summary5w1h = Object.values(answer).reduce((prev, value) => {
-      if (!Array.isArray(value)) return prev;
-      return prev + (value.length && 1);
-    }, 0);
+    const sum = { subjective: 0 };
+    sum.subjective += 5 - answer.importance;
+    sum.subjective += 5 - answer.urgency;
+    sum.subjective += 5 - answer.novelty;
+    sum.subjective += answer.bias;
+    sum.subjective /= 4;
     return {
-      ...answer,
-      summary5w1h,
+      ...answer, ...sum,
     };
   })
   .then(answer => {
