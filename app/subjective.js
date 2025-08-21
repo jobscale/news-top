@@ -40,7 +40,12 @@ export const calcScore = async title => {
   const content = `${question}\n\nTitle: ${title}`;
   return llmFetch({
     model: server.model,
-    messages: [{ role: 'user', content }],
+    messages: [{
+      role: 'user',
+      content: [
+        { type: 'text', text: content },
+      ],
+    }],
     temperature: 0.4,
     max_tokens: 256,
   })
