@@ -9,9 +9,9 @@
   "author": "jobscale <jobscale@users.noreply.github.com>",
   "main": "index.js",
   "scripts": {
-    "start": "TZ=Etc/GMT bash vv",
+    "start": "node .",
+    "test": "TZ=Etc/GMT bash vv",
     "lint": "eslint .",
-    "test": "node test",
     "cronjob": "node ."
   },
   "license": "MIT",

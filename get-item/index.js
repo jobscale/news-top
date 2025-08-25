@@ -2,6 +2,7 @@ import { DynamoDBClient, GetItemCommand } from '@aws-sdk/client-dynamodb';
 import { unmarshall, marshall } from '@aws-sdk/util-dynamodb';
 
 const logger = console;
+const TableName = 'News';
 const client = new DynamoDBClient({
   endpoint: 'http://n100.jsx.jp:4566',
   region: 'ap-northeast-1',
@@ -13,7 +14,7 @@ const client = new DynamoDBClient({
 
 const run = async () => {
   const data = await client.send(new GetItemCommand({
-    TableName: 'News',
+    TableName,
     Key: marshall({ Title: 'history' }),
   }));
 
@@ -21,7 +22,7 @@ const run = async () => {
   if (!item) return;
 
   const filtered = item.history
-  .filter(entry => Number.isInteger(entry?.score) && entry.score >= 7)
+  .filter(entry => Number.isInteger(entry?.score) && entry.score >= 3)
   // .filter(entry => !entry?.deny)
   // .filter(entry => entry?.emergency)
   .slice(-30);
