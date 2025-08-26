@@ -1,5 +1,7 @@
-import { DynamoDBClient, GetItemCommand } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, GetItemCommand, DeleteTableCommand } from '@aws-sdk/client-dynamodb';
 import { unmarshall, marshall } from '@aws-sdk/util-dynamodb';
+
+const { REMOVE } = process.env;
 
 const logger = console;
 const TableName = 'News';
@@ -12,7 +14,18 @@ const client = new DynamoDBClient({
   },
 });
 
+const remove = async () => {
+  await client.send(new DeleteTableCommand({
+    TableName,
+  }));
+};
+
 const run = async () => {
+  if (REMOVE) {
+    await remove();
+    logger.info({ table: 'removed' });
+    return;
+  }
   const data = await client.send(new GetItemCommand({
     TableName,
     Key: marshall({ Title: 'history' }),
@@ -22,7 +35,7 @@ const run = async () => {
   if (!item) return;
 
   const filtered = item.history
-  .filter(entry => Number.isInteger(entry?.score) && entry.score >= 3)
+  .filter(entry => Number.isInteger(entry?.score) && entry.score >= 0)
   // .filter(entry => !entry?.deny)
   // .filter(entry => entry?.emergency)
   .slice(-30);
