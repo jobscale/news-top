@@ -6,21 +6,23 @@ const logger = console;
 if (DEBUG) logger.info(JSON.stringify(Object.keys(servers)));
 const server = servers[LLAMA || 'prod'];
 
+// 5W1H の具体性を確認する：
+// - Who（誰が）
+// - What（何を）
+// - When（いつ）
+// - Where（どこで）
+// - Why（なぜ）
+// - How（どのように）
+
 const question = `以下のニュースに対して、具体性を確認します。
 正確性を確認したいので連想しないでください。
-5W1H の具体性を確認する：
-- Who（誰が）
-- What（何を）
-- When（いつ）
-- Where（どこで）
-- Why（なぜ）
-- How（どのように）
 
 回答は JSON 形式で出力してください。
-{"importance":重要性,"urgency":緊急性,"novelty":新規性,"bias":偏見・不公平・主観}
+{"credibility":信頼性,"importance":重要性,"urgency":緊急性,"novelty":希少性・異常性・新規性,"bias":偏見・不公平・主観}
+- 信頼性：float 0.0〜5.0 の範囲
 - 重要性：float 0.0〜5.0 の範囲
 - 緊急性：float 0.0〜5.0 の範囲
-- 新規性：float 0.0〜5.0 の範囲
+- 希少性・異常性・新規性：float 0.0〜5.0 の範囲
 - 偏見・不公平・主観：float 0.0〜5.0 の範囲 具体性の欠如はスコア 5.0
 説明や理由やは不要です。
 `;
@@ -60,35 +62,7 @@ export const calcScore = async title => {
   })
   .catch(e => logger.warn(e) ?? {})
   .then(answer => {
-    const seen = new Set();
-    Object.keys(answer).reverse().forEach(key => {
-      if (!Array.isArray(answer[key])) return;
-      answer[key] = answer[key].filter(item => {
-        if (!item) return false;
-        const isSeen = seen.has(item);
-        if (isSeen) return false;
-        seen.add(item);
-        if (!title.includes(item)) {
-          logger.error([item], key, JSON.stringify({ title, ...answer }));
-          return false;
-        }
-        return true;
-      });
-    });
-    if (answer.how?.length) {
-      logger.error(answer.how, 'how', JSON.stringify({ title, ...answer }));
-      answer.how = [];
-    }
-
-    const sum = { subjective: 0 };
-    sum.subjective += 5 - answer.importance;
-    sum.subjective += 5 - answer.urgency;
-    sum.subjective += 5 - answer.novelty;
-    sum.subjective += answer.bias;
-    sum.subjective /= 4;
-    return {
-      ...answer, ...sum,
-    };
+    return { ...answer };
   })
   .then(answer => {
     return { ...answer, benchmark5w1h: `${(Date.now() - start) / 1000}s` };

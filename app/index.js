@@ -46,7 +46,7 @@ export class App {
         const [score, title] = await this.filterItem(Title)
         .catch(e => logger.error(e) || this.filterItem(Title));
         if (title) {
-          return [`<${anchor.href}|${title}> Y\\n${score}`];
+          return [`<${anchor.href}|${title}> Y\n${score}`];
         }
       }
       return [];
@@ -67,7 +67,7 @@ export class App {
         const [score, title] = await this.filterItem(item.title)
         .catch(e => logger.error(e) || this.filterItem(item.title));
         if (title) {
-          return [`<${baseUrl}${item.link}|${title}> A\\n${score}`];
+          return [`<${baseUrl}${item.link}|${title}> A\n${score}`];
         }
       }
       return [];
