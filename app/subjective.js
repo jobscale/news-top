@@ -6,16 +6,14 @@ const logger = console;
 if (DEBUG) logger.info(JSON.stringify(Object.keys(servers)));
 const server = servers[LLAMA || 'prod'];
 
-// 5W1H の具体性を確認する：
-// - Who（誰が）
-// - What（何を）
-// - When（いつ）
-// - Where（どこで）
-// - Why（なぜ）
-// - How（どのように）
-
-const question = `以下のニュースに対して、具体性を確認します。
-正確性を確認したいので連想しないでください。
+const question = `以下のニュースに対して、具体性・正確性を確認します。
+5W1H の具体性・正確性を確認する：
+- Who（誰が）
+- What（何を）
+- When（いつ）
+- Where（どこで）
+- Why（なぜ）
+- How（どのように）
 
 回答は JSON 形式で出力してください。
 {"credibility":信頼性,"importance":重要性,"urgency":緊急性,"novelty":希少性・異常性・新規性,"bias":偏見・不公平・主観}

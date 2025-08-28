@@ -3,7 +3,7 @@ import { calcScore as calc5w1h } from './subjective.js';
 
 const logger = console;
 const bewitch = [
-  '芸能', 'スポーツ', 'エンタメ', '政治', '選挙',
+  '芸能', 'スポーツ', 'エンタメ', 'タレント', '政治', '選挙',
   '個人', '家族', '犯罪', '過去', '戦争', '遺族', '歴史',
 ];
 
@@ -12,7 +12,7 @@ export const aiCalc = async title => {
     ...await calcScore(title).catch(e => logger.warn(e) || {}),
     ...await calc5w1h(title).catch(e => logger.warn(e) || {}),
   };
-  const cheat = Math.min(1.5, bewitch.filter(word => ai.influence?.includes(word)).length);
+  const cheat = Math.min(2.5, bewitch.filter(word => ai.influence?.includes(word)).length);
   const sum = { subjective: 0, cheat };
   sum.subjective += 5 - ai.credibility;
   sum.subjective += 5 - ai.importance;
