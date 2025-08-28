@@ -132,6 +132,7 @@ export class App {
       Item: { Title: 'history', history },
     }));
     if (duplicate) return [score];
+    if (ai.score < 3) return [score];
     if (deny.length > 1) return [score];
     if (!emergency.length) {
       if (ai.score < 4) return [score];
