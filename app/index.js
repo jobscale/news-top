@@ -133,8 +133,8 @@ export class App {
     }));
     if (duplicate) return [score];
     if (deny.length > 1) return [score];
-    if (ai.score < 2) return [score];
-    if (!emergency.length && ai.score < 3) {
+    if (!emergency.length) {
+      if (ai.score < 4) return [score];
       if (deny.length) return [score];
     }
     return [score, Title];
