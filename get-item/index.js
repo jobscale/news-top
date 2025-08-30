@@ -34,12 +34,9 @@ const run = async () => {
   const item = data?.Item && unmarshall(data.Item);
   if (!item) return;
 
-  const filtered = item.history
-  .filter(entry => Number.isInteger(entry?.score) && entry.score >= 0)
-  // .filter(entry => !entry?.deny)
-  // .filter(entry => entry?.emergency)
-  // .slice(-30)
-  ;
+  const filtered = item.history;
+  // .filter(entry => Number.isInteger(entry?.score) && entry.score >= 0)
+  // .slice(-30);
 
   logger.info(JSON.stringify(filtered, null, 2));
 };
