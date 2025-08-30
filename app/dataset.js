@@ -140,13 +140,13 @@ export const detail = {
 
 export const dataset = {
   emergency,
-  mediocre: Object.values(detail).flat(),
+  noisy: Object.values(detail).flat(),
 };
 
-export const logical = title => {
+export const extractKeywords = title => {
   return {
     emergency: dataset.emergency.filter(em => title.match(em)),
-    mediocre: dataset.mediocre.filter(text => title.match(new RegExp(text))),
+    noisy: dataset.noisy.filter(text => title.match(new RegExp(text))),
   };
 };
 

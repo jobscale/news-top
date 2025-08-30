@@ -1,26 +1,28 @@
-import { dataset, logical } from './dataset.js';
+import { dataset, extractKeywords } from './dataset.js';
 import { calcScore } from './credibility.js';
 
 const logger = console;
 
 export const aiCalc = async title => {
   const ai = {
-    ...await calcScore(title).catch(e => logger.warn(e) || {}),
+    ...await calcScore(title).catch(e => logger.warn(e) ?? {}),
   };
-  const logic = logical(title);
-  const sum = { subjective: 0, cheat: 0 };
-  sum.cheat += Math.max(0, logic.mediocre.length - (logic.emergency.length * 2));
-  Object.assign(ai, logic);
-  sum.cheat += dataset.mediocre.filter(word => ai.influence?.includes(word)).length;
-  sum.subjective += 5 - ai.credibility;
-  sum.subjective += 5 - ai.importance;
-  sum.subjective += 5 - ai.urgency;
-  sum.subjective += 5 - ai.novelty;
-  sum.subjective /= 4;
-  sum.subjective += ai.bias / 2;
-  sum.marks = ai.newsworthiness + ai.impact - sum.subjective;
-  sum.score = Math.max(0, sum.marks - sum.cheat);
-  return { ...ai, ...sum };
+  const logic = extractKeywords(title);
+  const sum = { subjectivity: 0, penalty: 0 };
+  sum.penalty += Math.max(0, logic.noisy.length - logic.emergency.length * 2);
+  sum.penalty += dataset.noisy.filter(word => ai.influence?.includes(word)).length;
+  const inverse = v => (5 - v) / 4;
+  sum.subjectivity += inverse(ai.credibility);
+  sum.subjectivity += inverse(ai.importance);
+  sum.subjectivity += inverse(ai.urgency);
+  sum.subjectivity += inverse(ai.novelty);
+  sum.subjectivity += ai.bias / 2;
+  sum.sensitivity = ai.negative < ai.positive ? ai.positive : ai.negative * -1;
+  delete ai.positive;
+  delete ai.negative;
+  sum.preliminary = ai.newsworthiness + ai.impact - sum.subjectivity;
+  sum.score = Math.max(0, sum.preliminary - sum.penalty);
+  return { ...ai, ...logic, ...sum };
 };
 
 export default {
