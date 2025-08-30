@@ -18,6 +18,7 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.828.0",
     "@aws-sdk/lib-dynamodb": "^3.828.0",
+    "@aws-sdk/util-dynamodb": "^3.879.0",
     "@jobscale/logger": "^0.8.1",
     "dayjs": "^1.11.13",
     "jsdom": "^26.1.0"

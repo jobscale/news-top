@@ -2,8 +2,8 @@ import dayjs from 'dayjs';
 import { JSDOM } from 'jsdom';
 import { DynamoDBClient, CreateTableCommand } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
+import { marshall } from '@aws-sdk/util-dynamodb';
 import { Logger } from '@jobscale/logger';
-import { filter } from './dataset.js';
 import { aiCalc } from './llm.js';
 import env from './env.js';
 
@@ -85,12 +85,10 @@ export class App {
         TableName,
         BillingMode: 'PAY_PER_REQUEST',
         AttributeDefinitions: [{
-          AttributeName: 'Title',
-          AttributeType: 'S',
+          AttributeName: 'Title', AttributeType: 'S',
         }],
         KeySchema: [{
-          AttributeName: 'Title',
-          KeyType: 'HASH',
+          AttributeName: 'Title', KeyType: 'HASH',
         }],
       }));
       await wait(5000);
@@ -117,27 +115,21 @@ export class App {
     .filter(v => v.timestamp >= LIMIT);
     const titles = history.map(v => v.Title);
     const duplicate = this.hasDuplicate(Title, titles, 0.5);
-    const { emergency, deny } = filter(Title);
     const ai = await aiCalc(Title);
     history.push({
-      ...ai, Title, timestamp: dayjs().unix(), emergency, duplicate, deny,
+      ...ai, Title, timestamp: dayjs().unix(), duplicate,
     });
     const score = JSON.stringify({ ...ai, title: undefined }, null, 2);
     const ITEM_LIMIT = 400 * 1024;
-    while (
-      Buffer.byteLength(JSON.stringify({ Title: 'history', history }), 'utf8') >= ITEM_LIMIT
-    ) { history.shift(); }
+    while (Buffer.byteLength(JSON.stringify(marshall({
+      Title: 'history', history,
+    })), 'utf8') >= ITEM_LIMIT) { history.shift(); }
     await ddbDoc.send(new PutCommand({
       TableName,
       Item: { Title: 'history', history },
     }));
     if (duplicate) return [score];
-    if (ai.score < 3) return [score];
-    if (deny.length > 1) return [score];
-    if (!emergency.length) {
-      if (ai.score < 4) return [score];
-      if (deny.length) return [score];
-    }
+    if (ai.score < 4) return [score];
     return [score, Title];
   }
 

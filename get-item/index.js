@@ -38,7 +38,8 @@ const run = async () => {
   .filter(entry => Number.isInteger(entry?.score) && entry.score >= 0)
   // .filter(entry => !entry?.deny)
   // .filter(entry => entry?.emergency)
-  .slice(-30);
+  // .slice(-30)
+  ;
 
   logger.info(JSON.stringify(filtered, null, 2));
 };
