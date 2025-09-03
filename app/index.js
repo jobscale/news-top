@@ -113,13 +113,16 @@ export class App {
       return [];
     }))
     .filter(v => v.timestamp >= LIMIT);
-    const titles = history.map(v => v.Title);
-    const duplicate = this.hasDuplicate(Title, titles, 0.5);
     const ai = await aiCalc(Title);
+    const detail = JSON.stringify({ ...ai, title: undefined }, null, 2);
+    ai.headline = true;
+    const titles = history.filter(v => v.headline).map(v => v.Title);
+    ai.duplicate = this.hasDuplicate(Title, titles, 0.5);
+    if (ai.duplicate) ai.headline = false;
+    if (ai.score < 4) ai.headline = false;
     history.push({
-      ...ai, Title, timestamp: dayjs().unix(), duplicate,
+      ...ai, Title, timestamp: dayjs().unix(),
     });
-    const score = JSON.stringify({ ...ai, title: undefined }, null, 2);
     const ITEM_LIMIT = 400 * 1024;
     while (Buffer.byteLength(JSON.stringify(marshall({
       Title: 'history', history,
@@ -128,9 +131,9 @@ export class App {
       TableName,
       Item: { Title: 'history', history },
     }));
-    if (duplicate) return [score];
-    if (ai.score < 4) return [score];
-    return [score, Title];
+
+    if (!ai.headline) return [detail];
+    return [detail, Title];
   }
 
   hasDuplicate(target, titles, threshold = 0.5) {
