@@ -119,7 +119,7 @@ export class App {
     const titles = history.filter(v => v.headline).map(v => v.Title);
     ai.duplicate = this.hasDuplicate(Title, titles, 0.5);
     if (ai.duplicate) ai.headline = false;
-    if (ai.score < 4) ai.headline = false;
+    if (ai.score < 5) ai.headline = false;
     history.push({
       ...ai, Title, timestamp: dayjs().unix(),
     });
