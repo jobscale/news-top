@@ -9,7 +9,7 @@ export const aiCalc = async title => {
   };
   const logic = extractKeywords(title);
   const sum = { subjectivity: 0, penalty: 0 };
-  sum.penalty += Math.max(0, logic.noisy.length - logic.emergency.length * 2.5);
+  sum.penalty += Math.max(0, logic.noisy.length - logic.emergency.length * 2);
   sum.penalty += dataset.noisy.filter(word => ai.influence?.includes(word)).length;
   const inverse = v => (5 - v) * 0.25;
   sum.subjectivity += inverse(ai.credibility);
