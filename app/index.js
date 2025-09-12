@@ -171,7 +171,7 @@ export class App {
     ), null, 2));
     return priseList.filter(amz => {
       const sale = Number.parseInt(amz.price.replace(/,/g, ''), 10);
-      if (ts >= '12:00' && ts <= '12:10') return true;
+      if (ts >= '11:00' && ts <= '11:10') return true;
       return sale <= amz.sale;
     }).map(amz => `${amz.name} <${amz.uri}|${amz.price}>`);
   }

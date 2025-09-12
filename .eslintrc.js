@@ -17,6 +17,7 @@ module.exports = {
     'import/extensions': 'off',
     'arrow-body-style': 'off',
     'no-param-reassign': 'off',
+    'no-plusplus': 'off',
   },
   env: {
     node: true,
