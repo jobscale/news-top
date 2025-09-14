@@ -7,14 +7,6 @@ if (DEBUG) logger.info(JSON.stringify(Object.keys(servers)));
 const server = servers[LLAMA || 'prod'];
 
 const question = `以下のニュースタイトルが客観的で根拠のある信頼できる報道であるスコアを付けてください。
-- 構造（5W1H）が欠落している（無価値）
-- コラム・インタビュー・会見（無価値）
-- 歴史的な出来事、過去の話題（無価値）
-- 未来の予定・構想・計画（無価値）
-- 未確認・不確定・可能性・計画中・賛否（無価値）
-- 快方・縮小・影響の減少（無価値）
-- 否定的な話題、抽象的な話題（無価値）
-- 病気、怪我、疾患、患者、治療、入退院（無価値）
 
 回答は JSON 形式で出力してください。
 {"newsworthiness":報道価値,"impact":影響力,"influence":["影響範囲"],"negative":ネガティブ,"positive":ポジティブ,"credibility":信頼性,"importance":重要性,"urgency":緊急性,"novelty":希少性・異常性・新規性,"bias":偏見・不公平・主観}
