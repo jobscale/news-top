@@ -1,8 +1,9 @@
 import dayjs from 'dayjs';
 import { Logger } from '@jobscale/logger';
+import './env.js';
 import { app as news } from './app/index.js';
 import { list, amz } from './app/list.js';
-import { getHoliday } from './app/holiday.js';
+import { timeSignal } from './app/time-signal.js';
 
 const logger = new Logger({ timestamp: true });
 const wait = ms => new Promise(resolve => { setTimeout(resolve, ms); });
@@ -25,7 +26,7 @@ class App {
     const opts = {};
     for (const row of rows) {
       if (!opts.first) opts.first = true;
-      else await wait(10000);
+      else await wait(8000);
       await this.postSlack({
         channel: '#random',
         icon_emoji: ':rolled_up_newspaper:',
@@ -46,32 +47,32 @@ class App {
     .catch(e => logger.error(e));
   }
 
+  async news() {
+    const rows = [];
+    for (const uri of list) {
+      const items = await news.yahoo(uri).catch(e => logger.error(e) || []);
+      if (items.length) rows.push(...items);
+    }
+    const items = await news.asahi().catch(e => logger.error(e) || []);
+    if (items.length) rows.push(...items);
+    return rows;
+  }
+
   async start() {
     const [, time] = dayjs().add(9, 'hour').toISOString().split('T');
     const [hh, mm] = time.split(':');
     const ts = `${hh}:${mm}`;
     const rows = [];
-    for (const uri of list) {
-      const items = await news.yahoo(uri).catch(e => logger.error(e) || []);
-      if (items.length) {
-        rows.push(...items);
-        break;
-      }
-    }
-    if (!rows.length) {
-      const items = await news.asahi().catch(e => logger.error(e) || []);
+    for (let i = 0; i < 3; i++) {
+      const items = await this.news();
       if (items.length) rows.push(...items);
+      else break;
     }
-    await this.post(rows);
-    if (ts >= '11:00' && ts <= '11:10') {
+    if (rows.length) await this.post(rows);
+    if (ts >= '10:50' && ts <= '11:10') {
       await this.amz(ts);
-      await getHoliday()
-      .then(holiday => this.post(holiday, 'Holiday'));
-      return;
     }
-    if (rows.length) return;
-    if (ts >= '21:00' || ts < '08:00') return;
-    await this.amz(ts);
+    await timeSignal.startTimeSignal();
   }
 }
 
