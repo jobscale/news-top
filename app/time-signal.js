@@ -42,6 +42,14 @@ export class TimeSignal {
   }
 
   async timeSignal() {
+    const opts = {
+      time: dayjs().endOf('hour').add(1, 'second'),
+    };
+    opts.target = opts.time.subtract(10, 'second');
+    const MAX_MINUTES = 5 * 60 * 1000;
+    opts.left = opts.target.diff(dayjs());
+    if (opts.left < 0 || opts.left > MAX_MINUTES) return;
+
     if (!this.cert) {
       this.cert = await db.getValue('config/certificate', 'secret');
       webPush.setVapidDetails(
@@ -53,12 +61,10 @@ export class TimeSignal {
     if (!this.users) {
       this.users = await store.getValue('web/users', 'info');
     }
-    const opts = {
-      time: dayjs().endOf('hour').add(1, 'second'),
-    };
-    opts.target = opts.time.subtract(10, 'second');
+
+    logger.info(JSON.stringify({ left: opts.left / 1000 }));
     opts.left = opts.target.diff(dayjs());
-    const MAX_MINUTES = 5 * 60 * 1000;
+    logger.info(JSON.stringify({ left: opts.left / 1000 }));
     if (opts.left < 0 || opts.left > MAX_MINUTES) return;
     await new Promise(resolve => { setTimeout(resolve, opts.left); });
     const timestamp = formatTimestamp(opts.time);
