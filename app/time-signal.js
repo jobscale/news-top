@@ -46,7 +46,7 @@ export class TimeSignal {
       time: dayjs().endOf('hour').add(1, 'second'),
     };
     opts.target = opts.time.subtract(10, 'second');
-    const MAX_MINUTES = 5 * 60 * 1000;
+    const MAX_MINUTES = 7 * 60 * 1000;
     opts.left = opts.target.diff(dayjs());
     if (opts.left < 0 || opts.left > MAX_MINUTES) return;
 
