@@ -72,6 +72,7 @@ export class TimeSignal {
     const body = [`Time is it ${timestamp}`, '', ...holidays].join('\n');
     const payload = {
       title: 'Time Signal',
+      expired: `${formatTimestamp(opts.target.add(12, 'second'))} GMT+9`,
       body,
       icon: '/favicon.ico',
     };
