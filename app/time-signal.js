@@ -68,13 +68,11 @@ export class TimeSignal {
     if (opts.left < 0 || opts.left > MAX_MINUTES) return;
     await new Promise(resolve => { setTimeout(resolve, opts.left); });
     const timestamp = formatTimestamp(opts.time);
+    const expired = `${formatTimestamp(opts.target.add(12, 'second'))} GMT+9`;
     const holidays = await getHoliday();
-    const body = [`Time is it ${timestamp}`, '', ...holidays].join('\n');
+    const body = [`It's ${timestamp} o'clock`, '', ...holidays].join('\n');
     const payload = {
-      title: 'Time Signal',
-      expired: `${formatTimestamp(opts.target.add(12, 'second'))} GMT+9`,
-      body,
-      icon: '/favicon.ico',
+      title: 'Time Signal', expired, body, icon: '/favicon.ico',
     };
     const unitUsers = sliceByUnit(Object.values(this.users), 10);
     for (const unit of unitUsers) {
