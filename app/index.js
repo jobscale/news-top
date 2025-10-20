@@ -7,7 +7,7 @@ import { Logger } from '@jobscale/logger';
 import { aiCalc } from './llm.js';
 import env from './env.js';
 
-const logger = new Logger({ noPathName: true });
+const logger = new Logger();
 const wait = ms => new Promise(resolve => { setTimeout(resolve, ms); });
 const toNumber = num => num.toLocaleString();
 const auth = JSON.parse(Buffer.from(env.auth, 'base64').toString());
@@ -43,8 +43,7 @@ export class App {
     .then(async anchorList => {
       for (const anchor of anchorList) {
         const Title = anchor.textContent.trim();
-        const [score, title] = await this.filterItem(Title)
-        .catch(e => logger.error(e) || this.filterItem(Title));
+        const [score, title] = await this.filterItem(Title);
         if (title) {
           return [[`<${anchor.href}|${title}> Y`, '```', score, '```'].join('\n')];
         }
@@ -64,8 +63,7 @@ export class App {
     .then(res => res.json())
     .then(async res => {
       for (const item of res.item || []) {
-        const [score, title] = await this.filterItem(item.title)
-        .catch(e => logger.error(e) || this.filterItem(item.title));
+        const [score, title] = await this.filterItem(item.title);
         if (title) {
           return [[`<${baseUrl}${item.link}|${title}> A`, '```', score, '```'].join('\n')];
         }
@@ -74,13 +72,13 @@ export class App {
     });
   }
 
-  async filterItem(Title) {
+  async filterItem(Title, opts = { attempts: 1 }) {
     const { Item } = await ddbDoc.send(new GetCommand({
       TableName,
       Key: { Title },
     }))
     .catch(async e => {
-      logger.error(e);
+      logger.warn(e.message, 'Try CreateTable');
       await ddb.send(new CreateTableCommand({
         TableName,
         BillingMode: 'PAY_PER_REQUEST',
@@ -92,8 +90,14 @@ export class App {
         }],
       }));
       await wait(5000);
+      if (opts.attempts) {
+        opts.attempts--;
+        return this.filterItem(Title, opts);
+      }
+      throw e;
     });
     if (Item) return [];
+    logger.info({ news: Title });
     await ddbDoc.send(new PutCommand({
       TableName,
       Item: { Title },
@@ -109,7 +113,7 @@ export class App {
     const LIMIT = dayjs().subtract(90, 'day').unix();
     const history = (await getHistory()
     .catch(e => {
-      logger.warn(JSON.stringify(e));
+      logger.warn(e.message);
       return [];
     }))
     .filter(v => v.timestamp >= LIMIT);
@@ -120,9 +124,8 @@ export class App {
     ai.duplicate = this.hasDuplicate(Title, titles, 0.5);
     if (ai.duplicate) ai.headline = false;
     if (ai.score < 5) ai.headline = false;
-    history.push({
-      ...ai, Title, timestamp: dayjs().unix(),
-    });
+    const timestamp = dayjs().add(9, 'hour').toISOString().replace(/\..+$/, '+0900');
+    history.push({ ...ai, Title, timestamp });
     const ITEM_LIMIT = 400 * 1024;
     while (Buffer.byteLength(JSON.stringify(marshall({
       Title: 'history', history,

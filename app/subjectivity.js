@@ -58,7 +58,7 @@ export const calcScore = async title => {
       return {};
     });
   })
-  .catch(e => logger.warn(e) ?? {})
+  .catch(e => logger.warn(e.message, { endpoint: server.endpoint }) ?? {})
   .then(answer => {
     return { ...answer };
   })
