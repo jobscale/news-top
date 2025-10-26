@@ -8,7 +8,7 @@ import { aiCalc } from './llm.js';
 import env from './env.js';
 
 const logger = new Logger();
-const wait = ms => new Promise(resolve => { setTimeout(resolve, ms); });
+const toJST = (ts = dayjs()) => ts.add(9, 'hour').toISOString().replace(/\..+$/, '+0900');
 const toNumber = num => num.toLocaleString();
 const auth = JSON.parse(Buffer.from(env.auth, 'base64').toString());
 Object.assign(process.env, {
@@ -92,7 +92,7 @@ export class App {
           AttributeName: 'Title', KeyType: 'HASH',
         }],
       }));
-      await wait(5000);
+      await new Promise(resolve => { setTimeout(resolve, 5000); });
       if (opts.attempts) {
         opts.attempts--;
         return this.filterItem(Title, opts);
@@ -113,7 +113,7 @@ export class App {
       }));
       return history;
     };
-    const LIMIT = dayjs().subtract(90, 'day').unix();
+    const LIMIT = toJST(dayjs().subtract(90, 'day'));
     const history = (await getHistory()
     .catch(e => {
       logger.warn(e.message);
@@ -127,7 +127,7 @@ export class App {
     ai.duplicate = this.hasDuplicate(Title, titles, 0.5);
     if (ai.duplicate) ai.headline = false;
     if (ai.score < 5) ai.headline = false;
-    const timestamp = dayjs().add(9, 'hour').toISOString().replace(/\..+$/, '+0900');
+    const timestamp = toJST();
     history.push({ ...ai, Title, timestamp });
     const ITEM_LIMIT = 400 * 1024;
     while (Buffer.byteLength(JSON.stringify(marshall({

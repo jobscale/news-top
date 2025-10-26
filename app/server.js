@@ -1,6 +1,6 @@
 export const servers = {
   prod: {
-    endpoint: 'https://llama.x.jsx.jp/v1/chat/completions',
+    endpoint: 'http://dark.jsx.jp:2880/v1/chat/completions',
     model: 'Gemma-3n-E2B-it',
   },
   'in-lms': {
