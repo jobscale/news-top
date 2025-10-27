@@ -72,7 +72,7 @@ export class TimeSignal {
     const holidays = await getHoliday();
     const body = [`It's ${timestamp} o'clock`, '', ...holidays].join('\n');
     const payload = {
-      title: 'Time Signal', expired, body, icon: '/favicon.ico',
+      title: 'Time Signal', expired, body, icon: '/icon/mini-32x32.ico',
     };
     const unitUsers = sliceByUnit(Object.values(this.users), 10);
     for (const unit of unitUsers) {
