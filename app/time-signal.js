@@ -62,17 +62,23 @@ export class TimeSignal {
       this.users = await store.getValue('web/users', 'info');
     }
 
-    logger.info(JSON.stringify({ left: opts.left / 1000 }));
     opts.left = opts.target.diff(dayjs());
     logger.info(JSON.stringify({ left: opts.left / 1000 }));
     if (opts.left < 0 || opts.left > MAX_MINUTES) return;
+
+    const icons = [
+      '/icon/mini-32x32.ico',
+      '/icon/cat-hand.svg',
+    ];
+    const icon = icons[Math.floor(Math.random() * icons.length)];
+
     await new Promise(resolve => { setTimeout(resolve, opts.left); });
     const timestamp = formatTimestamp(opts.time);
     const expired = `${formatTimestamp(opts.target.add(12, 'second'))} GMT+9`;
     const holidays = await getHoliday();
     const body = [`It's ${timestamp} o'clock`, '', ...holidays].join('\n');
     const payload = {
-      title: 'Time Signal', expired, body, icon: '/icon/mini-32x32.ico',
+      title: 'Time Signal', expired, body, icon,
     };
     const unitUsers = sliceByUnit(Object.values(this.users), 10);
     for (const unit of unitUsers) {
