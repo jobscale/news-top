@@ -24,13 +24,21 @@ const sliceByUnit = (array, unit) => {
   .map((_, i) => array.slice(unit * i, unit * (i + 1)));
 };
 
+const icons = [
+  '/icon/mini-32x32.ico',
+  '/icon/cat-hand.svg',
+  '/icon/cat-hand-mini.svg',
+];
+
 export class TimeSignal {
   async pushSignal(payload, users) {
     await Promise.all(
       users.filter(user => user.subscription)
       .map(user => {
         const { subscription } = user;
-        return webPush.sendNotification(subscription, JSON.stringify(payload))
+        const icon = icons[Math.floor(Math.random() * icons.length)];
+        const notification = { ...payload, icon };
+        return webPush.sendNotification(subscription, JSON.stringify(notification))
         .then(() => logger.info('sendNotification', JSON.stringify(user)))
         .catch(e => {
           logger.error(e, JSON.stringify(user));
@@ -66,13 +74,7 @@ export class TimeSignal {
     logger.info(JSON.stringify({ left: opts.left / 1000 }));
     if (opts.left < 0 || opts.left > MAX_MINUTES) return;
 
-    const icons = [
-      '/icon/mini-32x32.ico',
-      '/icon/cat-hand.svg',
-      '/icon/cat-hand-mini.svg',
-    ];
     const icon = icons[Math.floor(Math.random() * icons.length)];
-
     await new Promise(resolve => { setTimeout(resolve, opts.left); });
     const timestamp = formatTimestamp(opts.time);
     const expired = `${formatTimestamp(opts.target.add(12, 'second'))} GMT+9`;
