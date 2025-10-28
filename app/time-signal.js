@@ -69,6 +69,7 @@ export class TimeSignal {
     const icons = [
       '/icon/mini-32x32.ico',
       '/icon/cat-hand.svg',
+      '/icon/cat-hand-mini.svg',
     ];
     const icon = icons[Math.floor(Math.random() * icons.length)];
 
