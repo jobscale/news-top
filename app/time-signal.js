@@ -25,7 +25,7 @@ const sliceByUnit = (array, unit) => {
 };
 
 const icons = [
-  '/icon/mini-32x32.ico',
+  '/favicon.ico',
   '/icon/cat-hand.svg',
   '/icon/cat-hand-mini.svg',
 ];
