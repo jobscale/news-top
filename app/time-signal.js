@@ -27,7 +27,11 @@ const sliceByUnit = (array, unit) => {
 const icons = [
   '/favicon.ico',
   '/icon/cat-hand.svg',
+  '/icon/cat-walk.svg',
+  '/icon/cat-point.svg',
   '/icon/cat-hand-mini.svg',
+  '/icon/mini-bird.svg',
+  '/icon/mini-github.svg',
 ];
 
 export class TimeSignal {
