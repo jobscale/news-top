@@ -5,8 +5,13 @@ const { REMOVE } = process.env;
 
 const logger = console;
 const TableName = 'News';
+const [, endpoint] = [
+  'https://lo-stack.jsx.jp',
+  'https://lo-stack.x.jsx.jp',
+  'http://lo-stack.x.jsx.jp:4566',
+];
 const client = new DynamoDBClient({
-  endpoint: 'http://n100.jsx.jp:4566',
+  endpoint,
   region: 'ap-northeast-1',
   credentials: {
     accessKeyId: 'test',
