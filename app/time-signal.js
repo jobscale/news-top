@@ -53,7 +53,7 @@ export class TimeSignal {
       .map(user => {
         const { subscription } = user;
         const icon = icons[Math.floor(Math.random() * icons.length)];
-        const body = this.render(payload.body, user);
+        const body = `${this.render(payload.body, user)}\n\n${icon}`;
         const notification = { ...payload, icon, body };
         logger.info(JSON.stringify(notification));
         return webPush.sendNotification(subscription, JSON.stringify(notification))
