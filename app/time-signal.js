@@ -26,10 +26,12 @@ const sliceByUnit = (array, unit) => {
 
 const icons = [
   '/favicon.ico',
-  '/icon/cat-hand.svg',
-  '/icon/cat-walk.svg',
-  '/icon/cat-point.svg',
+  '/icon/cat-hand-black.png',
   '/icon/cat-hand-mini.svg',
+  '/icon/cat-hand.svg',
+  '/icon/cat-point.svg',
+  '/icon/cat-walk.svg',
+  '/icon/favicon.png',
   '/icon/mini-bird.svg',
   '/icon/mini-github.svg',
 ];
@@ -42,6 +44,7 @@ export class TimeSignal {
         const { subscription } = user;
         const icon = icons[Math.floor(Math.random() * icons.length)];
         const notification = { ...payload, icon };
+        logger.info(JSON.stringify(notification));
         return webPush.sendNotification(subscription, JSON.stringify(notification))
         .then(() => logger.info('sendNotification', JSON.stringify(user)))
         .catch(e => {
