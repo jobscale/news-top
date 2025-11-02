@@ -37,20 +37,33 @@ const icons = [
 ];
 
 export class TimeSignal {
+  render(template, data) {
+    return Object.entries({
+      TEMPLATE_LOGIN: data.login ?? 'unknown login',
+      TEMPLATE_HOST: data.host ?? 'unknown host',
+    }).reduce(
+      (str, [key, value]) => str.replaceAll(`{{${key}}}`, value ?? ''),
+      template,
+    );
+  }
+
   async pushSignal(payload, users) {
     await Promise.all(
       users.filter(user => user.subscription)
       .map(user => {
         const { subscription } = user;
         const icon = icons[Math.floor(Math.random() * icons.length)];
-        const notification = { ...payload, icon };
+        const body = this.render(payload.body, user);
+        const notification = { ...payload, icon, body };
         logger.info(JSON.stringify(notification));
         return webPush.sendNotification(subscription, JSON.stringify(notification))
         .then(() => logger.info('sendNotification', JSON.stringify(user)))
         .catch(e => {
           logger.error(e, JSON.stringify(user));
-          const hash = createHash('sha3-256').update(subscription.endpoint).digest('base64');
-          delete this.users[hash];
+          if ([404, 410].includes(e.statusCode || e.status)) {
+            const hash = createHash('sha3-256').update(subscription.endpoint).digest('base64');
+            delete this.users[hash];
+          }
         });
       }),
     );
@@ -86,7 +99,11 @@ export class TimeSignal {
     const timestamp = formatTimestamp(opts.time);
     const expired = `${formatTimestamp(opts.target.add(12, 'second'))} GMT+9`;
     const holidays = await getHoliday();
-    const body = [`It's ${timestamp} o'clock`, '', ...holidays].join('\n');
+    const body = [
+      `It's ${timestamp} o'clock - {{TEMPLATE_LOGIN}} {{TEMPLATE_HOST}}`,
+      '',
+      ...holidays,
+    ].join('\n');
     const payload = {
       title: 'Time Signal', expired, body, icon,
     };
