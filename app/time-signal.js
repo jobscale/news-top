@@ -100,7 +100,9 @@ export class TimeSignal {
     const expired = `${formatTimestamp(opts.target.add(12, 'second'))} GMT+9`;
     const holidays = await getHoliday();
     const body = [
-      `It's ${timestamp} o'clock - {{TEMPLATE_LOGIN}} {{TEMPLATE_HOST}}`,
+      `It's ${timestamp} o'clock`,
+      '',
+      '{{TEMPLATE_LOGIN}} - {{TEMPLATE_HOST}}',
       '',
       ...holidays,
     ].join('\n');
