@@ -7,7 +7,7 @@ import { Logger } from '@jobscale/logger';
 import { aiCalc } from './llm.js';
 import env from './env.js';
 
-const logger = new Logger();
+const logger = new Logger({ noPathName: true, timestamp: true });
 const toJST = (ts = dayjs()) => ts.add(9, 'hour').toISOString().replace(/\..+$/, '+0900');
 const toNumber = num => num.toLocaleString();
 const auth = JSON.parse(Buffer.from(env.auth, 'base64').toString());
