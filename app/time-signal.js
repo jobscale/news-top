@@ -25,12 +25,9 @@ const sliceByUnit = (array, unit) => {
 };
 
 const icons = [
-  '/favicon.ico',
-  '/icon/cat-hand-black.png',
   '/icon/cat-hand.svg',
   '/icon/cat-point.svg',
   '/icon/cat-walk.svg',
-  '/icon/favicon.png',
   '/icon/mini-bird.svg',
   '/icon/mini-github.svg',
 ];
