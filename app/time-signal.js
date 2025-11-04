@@ -24,14 +24,6 @@ const sliceByUnit = (array, unit) => {
   .map((_, i) => array.slice(unit * i, unit * (i + 1)));
 };
 
-const icons = [
-  '/icon/cat-hand.svg',
-  '/icon/cat-point.svg',
-  '/icon/cat-walk.svg',
-  '/icon/mini-bird.svg',
-  '/icon/mini-github.svg',
-];
-
 export class TimeSignal {
   render(template, data) {
     return Object.entries({
@@ -48,9 +40,8 @@ export class TimeSignal {
       users.filter(user => user.subscription)
       .map(user => {
         const { subscription } = user;
-        const icon = icons[Math.floor(Math.random() * icons.length)];
-        const body = `${this.render(payload.body, user)}\n\n${icon}`;
-        const notification = { ...payload, icon, body };
+        const body = this.render(payload.body, user);
+        const notification = { ...payload, body };
         logger.info(JSON.stringify(notification));
         return webPush.sendNotification(subscription, JSON.stringify(notification))
         .then(() => logger.info('sendNotification', JSON.stringify(user)))
@@ -90,9 +81,11 @@ export class TimeSignal {
     logger.info(JSON.stringify({ left: opts.left / 1000 }));
     if (opts.left < 0 || opts.left > MAX_MINUTES) return;
 
-    const icon = icons[Math.floor(Math.random() * icons.length)];
     await new Promise(resolve => { setTimeout(resolve, opts.left); });
     const timestamp = formatTimestamp(opts.time);
+    const [, time] = timestamp.split(' ');
+    const [hh, mm] = time.split(':');
+    const icon = `/icon/${hh}:${mm}.svg`;
     const expired = `${formatTimestamp(opts.target.add(12, 'second'))} GMT+9`;
     const holidays = await getHoliday();
     const body = [
