@@ -57,11 +57,11 @@ export class TimeSignal {
   }
 
   async timeSignal() {
-    const opts = {
-      time: dayjs().endOf('hour').add(1, 'second'),
-    };
-    opts.target = opts.time.subtract(10, 'second');
     const MAX_MINUTES = 7 * 60 * 1000;
+    const opts = {
+      time: dayjs().add(1, 'hour').startOf('hour'),
+    };
+    opts.target = opts.time.subtract(15, 'second');
     opts.left = opts.target.diff(dayjs());
     if (opts.left < 0 || opts.left > MAX_MINUTES) return;
 
@@ -80,8 +80,14 @@ export class TimeSignal {
     opts.left = opts.target.diff(dayjs());
     logger.info(JSON.stringify({ left: opts.left / 1000 }));
     if (opts.left < 0 || opts.left > MAX_MINUTES) return;
+    await new Promise(resolve => {
+      const timeout = setInterval(() => {
+        if (opts.target.diff(dayjs()) > 0) return;
+        clearInterval(timeout);
+        resolve();
+      }, 1000);
+    });
 
-    await new Promise(resolve => { setTimeout(resolve, opts.left); });
     const timestamp = formatTimestamp(opts.time);
     const [, time] = timestamp.split(' ');
     const [hh, mm] = time.split(':');
