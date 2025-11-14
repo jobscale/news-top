@@ -91,7 +91,7 @@ export class TimeSignal {
     const timestamp = formatTimestamp(opts.time);
     const [, time] = timestamp.split(' ');
     const [hh, mm] = time.split(':');
-    const icon = `/png-mochiy/${hh}_${mm}.png`;
+    const icon = `/png-clock/${hh}_${mm}.png`;
     const expired = `${formatTimestamp(opts.target.add(12, 'second'))} GMT+9`;
     const holidays = await getHoliday();
     const body = [
