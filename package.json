@@ -16,7 +16,9 @@
     "lint": "eslint",
     "cronjob": "node ."
   },
-  "pre-commit": ["test"],
+  "pre-commit": [
+    "test"
+  ],
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.936.0",
     "@aws-sdk/client-s3": "^3.937.0",
@@ -32,6 +34,7 @@
     "eslint": "^9.39.1",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jest": "^29.2.0",
+    "husky": "^9.1.7",
     "precommit": "^1.2.2"
   }
 }
