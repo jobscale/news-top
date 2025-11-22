@@ -59,12 +59,8 @@ export const calcScore = async title => {
     });
   })
   .catch(e => logger.warn(e.message, { endpoint: server.endpoint }) ?? {})
-  .then(answer => {
-    return { ...answer };
-  })
-  .then(answer => {
-    return { ...answer, benchmark5w1h: `${(Date.now() - start) / 1000}s` };
-  });
+  .then(answer => ({ ...answer }))
+  .then(answer => ({ ...answer, benchmark5w1h: `${(Date.now() - start) / 1000}s` }));
 };
 
 export default { calcScore };

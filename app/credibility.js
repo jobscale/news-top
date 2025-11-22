@@ -57,12 +57,8 @@ export const calcScore = async title => {
     });
   })
   .catch(e => logger.warn(e) ?? {})
-  .then(answer => {
-    return { ...answer };
-  })
-  .then(answer => {
-    return { ...answer, benchmark: `${(Date.now() - start) / 1000}s` };
-  });
+  .then(answer => ({ ...answer }))
+  .then(answer => ({ ...answer, benchmark: `${(Date.now() - start) / 1000}s` }));
 };
 
 export default { calcScore };

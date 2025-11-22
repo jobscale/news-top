@@ -150,11 +150,9 @@ export const dataset = {
   noisy: Object.values(detail).flat(),
 };
 
-export const extractKeywords = title => {
-  return {
-    emergency: dataset.emergency.filter(em => title.match(em)),
-    noisy: dataset.noisy.filter(text => title.match(new RegExp(text))),
-  };
-};
+export const extractKeywords = title => ({
+  emergency: dataset.emergency.filter(em => title.match(em)),
+  noisy: dataset.noisy.filter(text => title.match(new RegExp(text))),
+});
 
 export default dataset;
