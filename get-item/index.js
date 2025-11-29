@@ -1,11 +1,11 @@
-import { DynamoDBClient, GetItemCommand, DeleteTableCommand } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, GetItemCommand, DeleteTableCommand, waitUntilTableNotExists } from '@aws-sdk/client-dynamodb';
 import { unmarshall, marshall } from '@aws-sdk/util-dynamodb';
 
-const { REMOVE } = process.env;
+const { DELETE } = process.env;
 
 const logger = console;
 const TableName = 'News';
-const [, endpoint] = [
+const [,, endpoint] = [
   'https://lo-stack.jsx.jp',
   'https://lo-stack.x.jsx.jp',
   'http://lo-stack.x.jsx.jp:4566',
@@ -20,15 +20,15 @@ const client = new DynamoDBClient({
 });
 
 const remove = async () => {
-  await client.send(new DeleteTableCommand({
-    TableName,
-  }));
+  const util = [{ client, maxWaitTime: 60 }, { TableName }];
+  await client.send(new DeleteTableCommand({ TableName })).catch(e => logger.warn(e.message));
+  await waitUntilTableNotExists(...util);
+  logger.info({ TableName, status: 'deleted' });
 };
 
 const run = async () => {
-  if (REMOVE) {
+  if (DELETE) {
     await remove();
-    logger.info({ table: 'removed' });
     return;
   }
   const data = await client.send(new GetItemCommand({

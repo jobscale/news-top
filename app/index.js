@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { JSDOM } from 'jsdom';
-import { DynamoDBClient, CreateTableCommand } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, CreateTableCommand, waitUntilTableExists } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { Logger } from '@jobscale/logger';
@@ -8,7 +8,6 @@ import { aiCalc } from './llm.js';
 import env from './env.js';
 
 const logger = new Logger({ noPathName: true, timestamp: true });
-const toJST = (ts = dayjs()) => ts.add(9, 'hour').toISOString().replace(/\..+$/, '+0900');
 const toNumber = num => num.toLocaleString();
 const auth = JSON.parse(Buffer.from(env.auth, 'base64').toString());
 Object.assign(process.env, {
@@ -17,17 +16,28 @@ Object.assign(process.env, {
   AWS_SECRET_ACCESS_KEY: auth.key,
 });
 const TableName = 'News';
-const [endpoint] = [
+const [, endpoint] = [
   'https://lo-stack.jsx.jp',
-  'https://lo-stack.x.jsx.jp',
+  process.env.XDG_SESSION_DESKTOP === 'cinnamon' ? 'http://lo-stack.x.jsx.jp:4566' : 'https://lo-stack.x.jsx.jp',
   'http://lo-stack.x.jsx.jp:4566',
 ];
 const ddb = new DynamoDBClient({
-  maxAttempts: 20,
+  maxAttempts: 10,
   // logger,
   endpoint,
 });
 const ddbDoc = new DynamoDBDocumentClient(ddb);
+
+const formatTimestamp = (ts = new Date()) => new Intl.DateTimeFormat('sv-SE', {
+  timeZone: 'Asia/Tokyo',
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit',
+}).format(new Date(ts));
+const toJST = (ts = new Date()) => [formatTimestamp(ts), '+0900'].join('');
 
 export class App {
   yahoo(uri) {
@@ -77,6 +87,7 @@ export class App {
   }
 
   async filterItem(Title, opts = { attempts: 1 }) {
+    const util = [{ client: ddb, maxWaitTime: 60 }, { TableName }];
     const { Item } = await ddbDoc.send(new GetCommand({
       TableName,
       Key: { Title },
@@ -93,7 +104,7 @@ export class App {
           AttributeName: 'Title', KeyType: 'HASH',
         }],
       }));
-      await new Promise(resolve => { setTimeout(resolve, 5000); });
+      await waitUntilTableExists(...util).catch(ea => logger.warn(ea.message));
       if (opts.attempts) {
         opts.attempts--;
         return this.filterItem(Title, opts);
@@ -127,7 +138,7 @@ export class App {
     const titles = history.filter(v => v.headline).map(v => v.Title);
     ai.duplicate = this.hasDuplicate(Title, titles, 0.5);
     if (ai.duplicate) ai.headline = false;
-    if (ai.score < 5) ai.headline = false;
+    if (ai.score < 4) ai.headline = false;
     const timestamp = toJST();
     history.push({ ...ai, Title, timestamp });
     const ITEM_LIMIT = 400 * 1024;
