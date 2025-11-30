@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -eu
+
+start-bench() {
+  HOST=dark;
+  MODEL="$1"
+  TIME=$(date -Iseconds)
+  mkdir -p res
+  re-run() {
+    docker rm -f llm.gemma-3
+    docker run --name llm.gemma-3 --memory 8g --shm-size 8g \
+      -p 2880:8080 -d ghcr.io/jobscale/llama.cpp:${MODEL}
+  }
+  echo "${MODEL}"
+  for i in {5..1}
+  do
+    sleep 1.2
+    echo -n "$i .. "
+  done
+  echo
+  {
+    echo "news Lines $(wc -l < test/news.txt) " 1>&2
+    time LLAMA=${HOST}-gemma-it node test/index.js | tee res/${HOST}-${MODEL}-${TIME} | jq .
+    echo "score Lines $(jq '.score' res/${HOST}-${MODEL}-${TIME} | wc -l)" 1>&2
+  } 2> res/${HOST}-${MODEL}-${TIME}.time
+  echo "${MODEL}"
+}
+
+{
+  time start-bench "${1:-gemma-3-4B-Q3}"
+}

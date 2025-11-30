@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+set -eu
+
+LIST=(
+  gemma-3-12b-Q3
+  gemma-3-12b-Q2
+
+  gemma-3-4B-Q4
+  gemma-3-4B-Q3
+
+  gemma-3n-E2B-Q8
+  gemma-3n-E2B-Q6
+  gemma-3n-E2B-Q5
+  gemma-3n-E2B-Q4
+  gemma-3n-E2B-Q3
+)
+
+download() {
+  echo
+  echo "### docker pull $1"
+  echo
+  time docker pull ghcr.io/jobscale/llama.cpp:$1
+}
+
+retry() {
+  for i in ${LIST[@]}
+  do
+    download "$i"
+  done
+}
+
+main() {
+  {
+    retry || retry
+  }
+
+  docker tag ghcr.io/jobscale/llama.cpp:gemma-3-4B-Q3 ghcr.io/jobscale/llama.cpp:mainline
+  docker push ghcr.io/jobscale/llama.cpp:mainline
+
+  docker images '--format={{.CreatedAt}} {{.ID}} {{.Size}} {{.Repository}}:{{.Tag}}' \
+  | grep llama.cpp | sort
+
+  docker image prune -f
+}
+
+main
