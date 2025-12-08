@@ -1,10 +1,10 @@
 import { servers } from './server.js';
 
-const { LLAMA, DEBUG } = process.env;
+const { ENV, LLAMA, DEBUG } = process.env;
 const logger = console;
 
 if (DEBUG) logger.info(JSON.stringify(Object.keys(servers)));
-const server = servers[LLAMA || 'prod'];
+const server = servers[LLAMA] || servers[ENV] || servers.dev;
 
 const question = `以下のニュースに対して、具体性・正確性を確認します。
 5W1H の具体性・正確性を確認する：
