@@ -1,3 +1,1 @@
-Object.assign(process.env, {
-  ENV: 'dev',
-});
+if (!process.env.ENV) process.env.ENV = 'dev';
