@@ -1,16 +1,4 @@
 export const servers = {
-  prod: {
-    endpoint: 'http://n100.jsx.jp:2880/v1/chat/completions',
-    model: 'Gemma-3n-E2B-it',
-  },
-  stg: {
-    endpoint: 'http://stg.jsx.jp:2880/v1/chat/completions',
-    model: 'Gemma-it',
-  },
-  dev: {
-    endpoint: 'http://dev.jsx.jp:2880/v1/chat/completions',
-    model: 'Gemma-it',
-  },
   'in-lms': {
     endpoint: 'http://in.jsx.jp:1234/v1/chat/completions',
     model: 'Gemma-3n-E2B-it',

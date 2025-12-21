@@ -28,16 +28,19 @@ const ddb = new DynamoDBClient({
 });
 const ddbDoc = new DynamoDBDocumentClient(ddb);
 
-const formatTimestamp = (ts = new Date()) => new Intl.DateTimeFormat('sv-SE', {
-  timeZone: 'Asia/Tokyo',
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-  hour: '2-digit',
-  minute: '2-digit',
-  second: '2-digit',
-}).format(new Date(ts));
-const toJST = (ts = new Date()) => [formatTimestamp(ts), '+0900'].join('');
+const formatTimestamp = (ts = Date.now(), withoutTimezone = false) => {
+  const timestamp = new Intl.DateTimeFormat('sv-SE', {
+    timeZone: 'Asia/Tokyo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).format(new Date(ts));
+  if (withoutTimezone) return timestamp;
+  return `${timestamp}+9`;
+};
 
 export class App {
   yahoo(uri) {
@@ -57,9 +60,9 @@ export class App {
     .then(async anchorList => {
       for (const anchor of anchorList) {
         const Title = anchor.textContent.trim();
-        const [score, title] = await this.filterItem(Title);
+        const [score, title] = await this.filterItem(Title, 'Y');
         if (title) {
-          return [[`<${anchor.href}|${title}> Y`, '```', score, '```'].join('\n')];
+          return [[`<${anchor.href}|${title}>`, '```', score, '```'].join('\n')];
         }
       }
       return [];
@@ -77,55 +80,65 @@ export class App {
     .then(res => res.json())
     .then(async res => {
       for (const item of res.item || []) {
-        const [score, title] = await this.filterItem(item.title);
+        const [score, title] = await this.filterItem(item.title, 'A');
         if (title) {
-          return [[`<${baseUrl}${item.link}|${title}> A`, '```', score, '```'].join('\n')];
+          return [[`<${baseUrl}${item.link}|${title}>`, '```', score, '```'].join('\n')];
         }
       }
       return [];
     });
   }
 
-  async filterItem(Title, opts = { attempts: 1 }) {
+  async createTable() {
     const util = [{ client: ddb, maxWaitTime: 60 }, { TableName }];
+    await ddb.send(new CreateTableCommand({
+      TableName,
+      BillingMode: 'PAY_PER_REQUEST',
+      AttributeDefinitions: [{
+        AttributeName: 'Title', AttributeType: 'S',
+      }],
+      KeySchema: [{
+        AttributeName: 'Title', KeyType: 'HASH',
+      }],
+    }));
+    const result = await waitUntilTableExists(...util).catch(ea => logger.warn(ea.message));
+    if (!result) {
+      await new Promise(resolve => { setTimeout(resolve, 1000); });
+      return this.createTable();
+    }
+    logger.info('Table created successfully');
+    return result;
+  }
+
+  async filterItem(Title, media, opts = { attempts: 1 }) {
     const { Item } = await ddbDoc.send(new GetCommand({
       TableName,
       Key: { Title },
     }))
     .catch(async e => {
       logger.warn(e.message, 'Try CreateTable');
-      await ddb.send(new CreateTableCommand({
-        TableName,
-        BillingMode: 'PAY_PER_REQUEST',
-        AttributeDefinitions: [{
-          AttributeName: 'Title', AttributeType: 'S',
-        }],
-        KeySchema: [{
-          AttributeName: 'Title', KeyType: 'HASH',
-        }],
-      }));
-      await waitUntilTableExists(...util).catch(ea => logger.warn(ea.message));
+      await this.createTable();
       if (opts.attempts) {
         opts.attempts--;
-        return this.filterItem(Title, opts);
+        return this.filterItem(Title, media, opts);
       }
       throw e;
     });
     if (Item) return [];
-    logger.info({ news: Title });
     await ddbDoc.send(new PutCommand({
       TableName,
       Item: { Title },
     }));
 
     const getHistory = async () => {
-      const { Item: { history } } = await ddbDoc.send(new GetCommand({
+      const { Item: historyItem = {} } = await ddbDoc.send(new GetCommand({
         TableName,
         Key: { Title: 'history' },
       }));
+      const { history = [] } = historyItem;
       return history;
     };
-    const LIMIT = toJST(dayjs().subtract(90, 'day'));
+    const LIMIT = formatTimestamp(dayjs().subtract(90, 'day'));
     const history = (await getHistory()
     .catch(e => {
       logger.warn(e.message);
@@ -133,14 +146,16 @@ export class App {
     }))
     .filter(v => v.timestamp >= LIMIT);
     const ai = await aiCalc(Title);
-    const detail = JSON.stringify({ ...ai, title: undefined }, null, 2);
+    const detail = JSON.stringify({ ...ai, title: undefined, media }, null, 2);
     ai.headline = true;
     const titles = history.filter(v => v.headline).map(v => v.Title);
     ai.duplicate = this.hasDuplicate(Title, titles, 0.5);
     if (ai.duplicate) ai.headline = false;
     if (ai.score < 4) ai.headline = false;
-    const timestamp = toJST();
-    history.push({ ...ai, Title, timestamp });
+    const timestamp = formatTimestamp();
+    const news = { Title, ...JSON.parse(detail), timestamp };
+    logger.info({ news });
+    history.push(JSON.parse(JSON.stringify(news)));
     const ITEM_LIMIT = 400 * 1024;
     while (Buffer.byteLength(JSON.stringify(marshall({
       Title: 'history', history,

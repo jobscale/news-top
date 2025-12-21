@@ -4,7 +4,7 @@ const { LLAMA, DEBUG } = process.env;
 const logger = console;
 
 if (DEBUG) logger.info(JSON.stringify(Object.keys(servers)));
-const server = servers[LLAMA || 'prod'];
+const server = servers[LLAMA || 'dark-gemma-it'];
 
 const question = `以下のニュースタイトルが客観的で根拠のある信頼できる報道であるスコアを付けてください。
 
