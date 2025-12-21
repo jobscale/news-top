@@ -36,18 +36,19 @@ class App {
   }
 
   async amz(ts) {
-    const priseList = await news.amazon(ts);
-    logger.info(ts, JSON.stringify(priseList, null, 2));
-    if (!priseList.length) return;
-    const text = priseList.join('\n');
+    const rows = [
+      ...await news.amazon(ts).catch(e => { logger.error(e); return []; }),
+    ];
+    if (!rows.length) return;
+    const text = rows.join('\n');
     await this.post([text], 'EC');
   }
 
   async news() {
     const rows = [
-      ...await news.asahi(),
-      ...await news.nikkei(),
-      ...await news.yahoo(),
+      ...await news.asahi().catch(e => { logger.error(e); return []; }),
+      ...await news.nikkei().catch(e => { logger.error(e); return []; }),
+      ...await news.yahoo().catch(e => { logger.error(e); return []; }),
     ];
     if (!rows.length) return;
     await this.post(rows);
