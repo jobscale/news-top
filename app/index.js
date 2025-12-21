@@ -1,14 +1,16 @@
 import dayjs from 'dayjs';
-import { JSDOM } from 'jsdom';
 import { DynamoDBClient, CreateTableCommand, waitUntilTableExists } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { Logger } from '@jobscale/logger';
 import { aiCalc } from './llm.js';
 import env from './env.js';
+import { newsFetch as yahooNewsFetch } from './yahoo.js';
+import { newsFetch as nikkeiNewsFetch } from './nikkei.js';
+import { newsFetch as asahiNewsFetch } from './asahi.js';
+import { priceFetch as amazonPriceFetch } from './amazon.js';
 
 const logger = new Logger({ noPathName: true, timestamp: true });
-const toNumber = num => num.toLocaleString();
 const auth = JSON.parse(Buffer.from(env.auth, 'base64').toString());
 Object.assign(process.env, {
   AWS_REGION: 'ap-northeast-1',
@@ -43,24 +45,24 @@ const formatTimestamp = (ts = Date.now(), withoutTimezone = false) => {
 };
 
 export class App {
-  yahoo(uri) {
-    return fetch(uri, {
-      headers: {
-        'accept-language': 'ja',
-        'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-      },
-    })
-    .then(res => res.text())
-    .then(body => new JSDOM(body).window.document)
-    .then(document => {
-      const anchorList = Array.from(document.querySelectorAll('[aria-label="NEW"]'))
-      .map(el => el.parentElement.parentElement);
-      return anchorList;
-    })
+  yahoo() {
+    return yahooNewsFetch()
     .then(async anchorList => {
       for (const anchor of anchorList) {
-        const Title = anchor.textContent.trim();
-        const [score, title] = await this.filterItem(Title, 'Y');
+        const [score, title] = await this.filterItem(anchor.title, anchor.media);
+        if (title) {
+          return [[`<${anchor.href}|${title}>`, '```', score, '```'].join('\n')];
+        }
+      }
+      return [];
+    });
+  }
+
+  nikkei() {
+    return nikkeiNewsFetch()
+    .then(async anchorList => {
+      for (const anchor of anchorList) {
+        const [score, title] = await this.filterItem(anchor.title, anchor.media);
         if (title) {
           return [[`<${anchor.href}|${title}>`, '```', score, '```'].join('\n')];
         }
@@ -70,19 +72,12 @@ export class App {
   }
 
   asahi() {
-    const baseUrl = 'https://news.tv-asahi.co.jp';
-    return fetch(`${baseUrl}/api/lchara_list.php?appcode=n4tAMkmEnY&page=0001`, {
-      headers: {
-        'accept-language': 'ja',
-        'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-      },
-    })
-    .then(res => res.json())
-    .then(async res => {
-      for (const item of res.item || []) {
-        const [score, title] = await this.filterItem(item.title, 'A');
+    return asahiNewsFetch()
+    .then(async anchorList => {
+      for (const anchor of anchorList) {
+        const [score, title] = await this.filterItem(anchor.title, anchor.media);
         if (title) {
-          return [[`<${baseUrl}${item.link}|${title}>`, '```', score, '```'].join('\n')];
+          return [[`<${anchor.href}|${title}>`, '```', score, '```'].join('\n')];
         }
       }
       return [];
@@ -192,36 +187,17 @@ export class App {
     return match / maxLength; // 一致率
   }
 
-  async amz(list, ts) {
-    const priseList = [];
-    for (const amz of list) {
-      await this.fetchAmz(amz.uri)
-      .then(price => priseList.push({ ...amz, price }))
-      .catch(e => logger.error(JSON.stringify({ message: e.message, amz })));
-    }
+  async amazon(ts) {
+    if (ts < '08:00' || ts > '20:10') return [];
+    const priseList = await amazonPriceFetch();
     logger.info(ts, JSON.stringify(priseList.map(
-      amz => `${amz.name} = ${toNumber(amz.sale)} / ${amz.price}`,
+      item => `${item.name} = ${item.price.toLocaleString()} / ${item.sale.toLocaleString()}`,
     ), null, 2));
-    return priseList.filter(amz => {
-      const sale = Number.parseInt(amz.price.replace(/,/g, ''), 10);
+    const sales = priseList.filter(item => {
       if (ts >= '11:00' && ts <= '11:10') return true;
-      return sale <= amz.sale;
-    }).map(amz => `${amz.name} <${amz.uri}|${amz.price}>`);
-  }
-
-  fetchAmz(uri) {
-    return fetch(uri, {
-      headers: {
-        'accept-language': 'ja',
-        'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-      },
-    })
-    .then(res => res.text())
-    .then(body => new JSDOM(body).window.document)
-    .then(document => {
-      const anchor = document.querySelector('#corePriceDisplay_desktop_feature_div');
-      return anchor.querySelector('.a-price-whole').textContent;
-    });
+      return item.price <= item.sale;
+    }).map(item => `${item.name} <${item.url}|${item.price.toLocaleString()}>`);
+    return sales;
   }
 }
 

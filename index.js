@@ -2,7 +2,6 @@ import dayjs from 'dayjs';
 import { Logger } from '@jobscale/logger';
 import './env.js';
 import { app as news } from './app/index.js';
-import { list, amz } from './app/list.js';
 import { timeSignal } from './app/time-signal.js';
 
 const logger = new Logger({ timestamp: true });
@@ -37,41 +36,29 @@ class App {
   }
 
   async amz(ts) {
-    return news.amz(amz, ts)
-    .then(priseList => {
-      logger.info(ts, JSON.stringify(priseList, null, 2));
-      if (!priseList.length) return undefined;
-      const text = priseList.join('\n');
-      return this.post([text], 'EC');
-    })
-    .catch(e => logger.error(e));
+    const priseList = await news.amazon(ts);
+    logger.info(ts, JSON.stringify(priseList, null, 2));
+    if (!priseList.length) return;
+    const text = priseList.join('\n');
+    await this.post([text], 'EC');
   }
 
   async news() {
-    const rows = [];
-    for (const uri of list) {
-      const items = await news.yahoo(uri).catch(e => logger.error(e) || []);
-      if (items.length) rows.push(...items);
-    }
-    const items = await news.asahi().catch(e => logger.error(e) || []);
-    if (items.length) rows.push(...items);
-    return rows;
+    const rows = [
+      ...await news.asahi(),
+      ...await news.nikkei(),
+      ...await news.yahoo(),
+    ];
+    if (!rows.length) return;
+    await this.post(rows);
   }
 
   async start() {
     const [, time] = dayjs().add(9, 'hour').toISOString().split('T');
     const [hh, mm] = time.split(':');
     const ts = `${hh}:${mm}`;
-    const rows = [];
-    for (let i = 0; i < 3; i++) {
-      const items = await this.news();
-      if (items.length) rows.push(...items);
-      else break;
-    }
-    if (rows.length) await this.post(rows);
-    if (ts >= '10:50' && ts <= '11:10') {
-      await this.amz(ts);
-    }
+    await this.news();
+    await this.amz(ts);
     await timeSignal.startTimeSignal();
   }
 }
