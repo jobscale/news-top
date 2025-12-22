@@ -46,6 +46,7 @@ class App {
 
   async news() {
     const rows = [
+      ...await news.rss().catch(e => { logger.error(e); return []; }),
       ...await news.asahi().catch(e => { logger.error(e); return []; }),
       ...await news.nikkei().catch(e => { logger.error(e); return []; }),
       ...await news.yahoo().catch(e => { logger.error(e); return []; }),

@@ -8,15 +8,19 @@ import { getHoliday } from './holiday.js';
 
 const logger = new Logger({ timestamp: true, noPathName: true });
 
-const formatTimestamp = ts => new Intl.DateTimeFormat('sv-SE', {
-  timeZone: 'Asia/Tokyo',
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-  hour: '2-digit',
-  minute: '2-digit',
-  second: '2-digit',
-}).format(ts || new Date());
+const formatTimestamp = (ts = Date.now(), withoutTimezone = false) => {
+  const timestamp = new Intl.DateTimeFormat('sv-SE', {
+    timeZone: 'Asia/Tokyo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).format(new Date(ts));
+  if (withoutTimezone) return timestamp;
+  return `${timestamp}+9`;
+};
 
 const sliceByUnit = (array, unit) => {
   const count = Math.ceil(array.length / unit);
@@ -27,7 +31,7 @@ const sliceByUnit = (array, unit) => {
 export class TimeSignal {
   render(template, data) {
     return Object.entries({
-      TEMPLATE_LOGIN: data.login ?? 'unknown login',
+      TEMPLATE_LOGIN: data.login ?? 'anonymous',
       TEMPLATE_HOST: data.host ?? 'unknown host',
     }).reduce(
       (str, [key, value]) => str.replaceAll(`{{${key}}}`, value ?? ''),
@@ -89,10 +93,10 @@ export class TimeSignal {
     });
 
     const timestamp = formatTimestamp(opts.time);
-    const [, time] = timestamp.split(' ');
+    const [, time] = timestamp.split(/[+ ]/);
     const [hh, mm] = time.split(':');
     const icon = `/png-clock/${hh}_${mm}.png`;
-    const expired = `${formatTimestamp(opts.target.add(12, 'second'))} GMT+9`;
+    const expired = formatTimestamp(opts.target.add(22, 'second'));
     const holidays = await getHoliday();
     const body = [
       `It's ${timestamp} o'clock`,

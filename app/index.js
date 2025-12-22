@@ -5,6 +5,7 @@ import { marshall } from '@aws-sdk/util-dynamodb';
 import { Logger } from '@jobscale/logger';
 import { aiCalc } from './llm.js';
 import env from './env.js';
+import { newsFetch as rssNewsFetch } from './rss.js';
 import { newsFetch as yahooNewsFetch } from './yahoo.js';
 import { newsFetch as nikkeiNewsFetch } from './nikkei.js';
 import { newsFetch as asahiNewsFetch } from './asahi.js';
@@ -45,6 +46,19 @@ const formatTimestamp = (ts = Date.now(), withoutTimezone = false) => {
 };
 
 export class App {
+  rss() {
+    return rssNewsFetch()
+    .then(async anchorList => {
+      for (const anchor of anchorList) {
+        const [score, title] = await this.filterItem(anchor.title, anchor.media);
+        if (title) {
+          return [[`<${anchor.href}|${title}>`, '```', score, '```'].join('\n')];
+        }
+      }
+      return [];
+    });
+  }
+
   yahoo() {
     return yahooNewsFetch()
     .then(async anchorList => {
