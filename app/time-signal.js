@@ -47,7 +47,7 @@ export class TimeSignal {
         const body = this.render(payload.body, user);
         const notification = { ...payload, body };
         logger.info(JSON.stringify(notification));
-        return webPush.sendNotification(subscription, JSON.stringify(notification))
+        return webPush.sendNotification(subscription, JSON.stringify(notification), { TTL: 60 })
         .then(() => logger.info('sendNotification', JSON.stringify(user)))
         .catch(e => {
           logger.error(e, JSON.stringify(user));
