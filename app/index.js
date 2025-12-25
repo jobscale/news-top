@@ -161,8 +161,14 @@ export class App {
     ai.duplicate = this.hasDuplicate(Title, titles, 0.5);
     if (ai.duplicate) ai.headline = false;
     if (ai.score < 4) ai.headline = false;
-    const timestamp = formatTimestamp();
-    const news = { Title, ...JSON.parse(detail), timestamp };
+    const news = {
+      Title,
+      score: ai.score,
+      newsworthiness: ai.newsworthiness,
+      impact: ai.impact,
+      subjectivity: ai.subjectivity,
+      timestamp: formatTimestamp(),
+    };
     logger.info({ news });
     history.push(JSON.parse(JSON.stringify(news)));
     const ITEM_LIMIT = 400 * 1024;
