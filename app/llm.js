@@ -21,8 +21,10 @@ export const aiCalc = async title => {
   delete ai.positive;
   delete ai.negative;
   sum.preliminary = ai.newsworthiness + ai.impact - sum.subjectivity;
-  const mediumScore = 3;
-  sum.score = Math.max(0, sum.preliminary - sum.penalty) || mediumScore;
+  sum.score = Math.max(0, sum.preliminary - sum.penalty);
+  if (!sum.score && sum.score !== 0) {
+    sum.score = Math.max(0, 3 - logic.noisy.length + logic.emergency.length * 1.5);
+  }
   return { ...ai, ...logic, ...sum };
 };
 
