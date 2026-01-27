@@ -6,23 +6,6 @@ const logger = console;
 if (DEBUG) logger.info(JSON.stringify(Object.keys(servers)));
 const server = servers[LLAMA || 'dark-gemma-it'];
 
-const question = `以下のニュースタイトルが客観的で根拠のある信頼できる報道であるスコアを付けてください。
-
-回答は JSON 形式で出力してください。
-{"newsworthiness":報道価値,"impact":影響力,"influence":["影響範囲"],"negative":ネガティブ,"positive":ポジティブ,"credibility":信頼性,"importance":重要性,"urgency":緊急性,"novelty":希少性・異常性・新規性,"bias":偏見・不公平・主観}
-- 報道価値：float 0.0〜5.0 の範囲
-- 影響力：float 0.0〜5.0 の範囲
-- 影響範囲：最大４つまで 例 建物,森林,海洋,産業,株価,経済,歴史,未来,過去,地球,宇宙,犯罪,国際,外交,災害,インフラ,選挙,政治,芸能,スポーツ,エンタメ,バラエティ,タレント,個人,家族,戦争,遺族
-- ネガティブ：float 0.0〜5.0 の範囲
-- ポジティブ：float 0.0〜5.0 の範囲
-- 信頼性：float 0.0〜5.0 の範囲
-- 重要性：float 0.0〜5.0 の範囲
-- 緊急性：float 0.0〜5.0 の範囲
-- 希少性・異常性・新規性：float 0.0〜5.0 の範囲
-- 偏見・不公平・主観：float 0.0〜5.0 の範囲 具体性の欠如はスコア 5.0
-説明や理由やは不要です。
-`;
-
 const llmFetch = async content => {
   const res = await fetch(server.endpoint, {
     method: 'POST',
@@ -32,9 +15,8 @@ const llmFetch = async content => {
   return res.json();
 };
 
-export const calcScore = async title => {
+export const calcScore = async content => {
   const start = Date.now();
-  const content = `${question}\n\nTitle: ${title}`;
   return llmFetch({
     model: server.model,
     messages: [{
@@ -47,9 +29,9 @@ export const calcScore = async title => {
     max_tokens: 256,
   })
   .then(res => {
-    if (DEBUG) logger.info('\n\n', JSON.stringify({ title, message: res.choices[0].message.content }));
+    if (DEBUG) logger.info('\n\n', JSON.stringify({ message: res.choices[0].message.content }));
     const match = res.choices[0].message.content.match(/\{[\s\S]*?\}/);
-    const answer = match ? match[0] : '{}';
+    const answer = match?.[0] ?? '{}';
     return (async () => JSON.parse(answer))()
     .catch(e => {
       logger.warn(e, { answer });

@@ -158,15 +158,12 @@ export class App {
     const detail = JSON.stringify({ ...ai, title: undefined, media }, null, 2);
     ai.headline = true;
     const titles = history.filter(v => v.headline).map(v => v.Title);
-    ai.duplicate = this.hasDuplicate(Title, titles, 0.5);
+    ai.duplicate = this.hasDuplicate(Title, titles, 0.4);
     if (ai.duplicate) ai.headline = false;
     if (ai.score < 4) ai.headline = false;
     const news = {
       Title,
-      score: ai.score,
-      newsworthiness: ai.newsworthiness,
-      impact: ai.impact,
-      subjectivity: ai.subjectivity,
+      ...ai,
       timestamp: formatTimestamp(),
     };
     logger.info({ news });
