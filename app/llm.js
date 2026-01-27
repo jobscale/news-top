@@ -3,7 +3,7 @@ import { dataset, extractKeywords } from './dataset.js';
 import { calcScore } from './credibility.js';
 import { scoreGemini } from './gemini.js';
 
-const useGemini = false;
+const useGemini = process.env.USE_GEMINI;
 
 const MODEL = [
   'gemini-2.5-flash',
@@ -53,7 +53,7 @@ export const aiCalc = async title => {
   }
   const logic = extractKeywords(title);
   const sum = { subjectivity: 0, penalty: 0 };
-  sum.penalty += ai.personal;
+  sum.penalty += ai.personal ?? 0;
   sum.penalty += dataset.noisy.filter(word => ai.location?.includes(word)).length;
   sum.penalty += dataset.noisy.filter(word => ai.category?.includes(word)).length;
   sum.penalty += dataset.noisy.filter(word => ai.influence?.includes(word)).length;
@@ -65,9 +65,11 @@ export const aiCalc = async title => {
   sum.subjectivity += inverse(ai.urgency);
   sum.subjectivity += inverse(ai.novelty);
   sum.subjectivity += ai.bias * 0.5;
-  sum.sensitivity = ai.positive - ai.negative;
-  delete ai.positive;
-  delete ai.negative;
+  if (ai.positive || ai.negative) {
+    sum.sensitivity = ai.positive - ai.negative;
+    delete ai.positive;
+    delete ai.negative;
+  }
   sum.preliminary = ai.newsworthiness + ai.impact - sum.subjectivity;
   sum.score = Math.max(0, sum.preliminary - sum.penalty);
   if (!sum.score && sum.score !== 0) {
