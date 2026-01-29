@@ -1,3 +1,4 @@
+import zlib from 'zlib';
 import dayjs from 'dayjs';
 import { DynamoDBClient, CreateTableCommand, waitUntilTableExists } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
@@ -139,13 +140,14 @@ export class App {
       Item: { Title },
     }));
 
+    const Key = { Title: 'history' };
     const getHistory = async () => {
       const { Item: historyItem = {} } = await ddbDoc.send(new GetCommand({
-        TableName,
-        Key: { Title: 'history' },
+        TableName, Key,
       }));
       const { history = [] } = historyItem;
-      return history;
+      if (Array.isArray(history)) return history;
+      return JSON.parse(zlib.gunzipSync(Buffer.from(history, 'base64')).toString());
     };
     const LIMIT = formatTimestamp(dayjs().subtract(90, 'day'));
     const history = (await getHistory()
@@ -168,13 +170,17 @@ export class App {
     };
     logger.info({ news });
     history.push(JSON.parse(JSON.stringify(news)));
+    const cache = {};
+    const compress = () => {
+      cache.compressed = zlib.gzipSync(JSON.stringify(history)).toString('base64');
+      return cache.compressed;
+    };
     const ITEM_LIMIT = 400 * 1024;
     while (Buffer.byteLength(JSON.stringify(marshall({
-      Title: 'history', history,
+      ...Key, history: compress(),
     })), 'utf8') >= ITEM_LIMIT) { history.shift(); }
     await ddbDoc.send(new PutCommand({
-      TableName,
-      Item: { Title: 'history', history },
+      TableName, Item: { ...Key, history: cache.compressed },
     }));
 
     if (!ai.headline) return [detail];
