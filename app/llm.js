@@ -38,8 +38,9 @@ ${useData.map(d => `${d.detail}`).join('\n')}
 `;
 
 const normalize = item => {
-  const scaler = v => Math.min(3, Math.max(0, v - 1)) * 5 / 3;
-  Object.keys(item).filter(key => Number.parseFloat(item[key], 10))
+  const isNumber = v => Number.parseFloat(v) === v * 1;
+  const scaler = v => Number.parseFloat((Math.min(3, Math.max(0, v - 1)) * 5 / 3).toFixed(2), 10);
+  Object.keys(item).filter(key => isNumber(item[key]))
   .forEach(key => { item[key] = scaler(item[key]); });
 };
 
