@@ -1,4 +1,7 @@
-import { DynamoDBClient, GetItemCommand, DeleteTableCommand, waitUntilTableNotExists } from '@aws-sdk/client-dynamodb';
+import zlib from 'zlib';
+import {
+  DynamoDBClient, GetItemCommand, DeleteTableCommand, waitUntilTableNotExists,
+} from '@aws-sdk/client-dynamodb';
 import { unmarshall, marshall } from '@aws-sdk/util-dynamodb';
 
 const { DELETE } = process.env;
@@ -31,15 +34,23 @@ const run = async () => {
     await remove();
     return;
   }
-  const data = await client.send(new GetItemCommand({
-    TableName,
-    Key: marshall({ Title: 'history' }),
-  }));
 
-  const item = data?.Item && unmarshall(data.Item);
-  if (!item) return;
+  const Key = marshall({ Title: 'history' });
+  const getHistory = async () => {
+    const { Item: historyItem = {} } = await client.send(new GetItemCommand({
+      TableName, Key,
+    }));
+    const { history = [] } = unmarshall(historyItem);
+    if (Array.isArray(history)) return history;
+    return JSON.parse(zlib.gunzipSync(Buffer.from(history, 'base64')).toString());
+  };
+  const history = await getHistory()
+  .catch(e => {
+    logger.warn(e.message);
+    return [];
+  });
 
-  const filtered = item.history;
+  const filtered = history;
   // .filter(entry => Number.isInteger(entry?.score) && entry.score >= 0)
   // .slice(-30);
 
