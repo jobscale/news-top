@@ -19,8 +19,8 @@ const data = [
   { property: '"novelty":希少性・異常性・新規性', detail: '希少性・異常性・新規性：float 0.0〜5.0 の範囲', priority: 5 },
   { property: '"bias":偏見・不公平・主観', detail: '偏見・不公平・主観：float 0.0〜5.0 の範囲 具体性の欠如はスコア 5.0', priority: 5 },
   { property: '"personal":個人的な事象・意見・感想', detail: '個人的な事象・意見・感想：float 0.0〜5.0 の範囲 個人的な内容はスコア 5.0', priority: 5 },
+  { property: '"category":[]', detail: 'カテゴリ：文字列の配列', priority: 5 },
   { property: '"location":[]', detail: '地理的な情報：文字列の配列', priority: 3 },
-  { property: '"category":[]', detail: 'カテゴリ：文字列の配列', priority: 3 },
   { property: '"influence":[]', detail: '影響範囲：文字列の配列', priority: 3 },
   { property: '"negative":ネガティブ', detail: 'ネガティブ：float 0.0〜5.0 の範囲', priority: 1 },
   { property: '"positive":ポジティブ', detail: 'ポジティブ：float 0.0〜5.0 の範囲', priority: 1 },
@@ -37,6 +37,12 @@ ${useData.map(d => `${d.detail}`).join('\n')}
 説明や理由やは不要です。
 `;
 
+const normalize = item => {
+  const scaler = v => Math.min(3, Math.max(0, v - 1)) * 5 / 3;
+  Object.keys(item).filter(key => Number.parseFloat(item[key], 10))
+  .forEach(key => { item[key] = scaler(item[key]); });
+};
+
 const store = {};
 export const aiCalc = async title => {
   const content = `${question}\n\nTitle: ${title}`;
@@ -51,6 +57,7 @@ export const aiCalc = async title => {
   if (!ai.newsworthiness && ai.newsworthiness !== 0) {
     Object.assign(ai, await calcScore(content), { model: 'llama' });
   }
+  normalize(ai);
   const logic = extractKeywords(title);
   const sum = { subjectivity: 0, penalty: 0 };
   sum.penalty += ai.personal ?? 0;
