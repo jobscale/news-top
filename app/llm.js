@@ -20,7 +20,7 @@ const data = [
   { property: '"bias":偏見・不公平・主観', detail: '偏見・不公平・主観：float 0.0〜5.0 の範囲 具体性の欠如はスコア 5.0', priority: 5 },
   { property: '"personal":個人的な事象・意見・感想', detail: '個人的な事象・意見・感想：float 0.0〜5.0 の範囲 個人的な内容はスコア 5.0', priority: 5 },
   { property: '"category":[]', detail: 'カテゴリ：文字列の配列', priority: 5 },
-  { property: '"location":[]', detail: '地理的な情報：文字列の配列', priority: 3 },
+  { property: '"location":[]', detail: '地理的な情報：文字列の配列', priority: 5 },
   { property: '"influence":[]', detail: '影響範囲：文字列の配列', priority: 3 },
   { property: '"negative":ネガティブ', detail: 'ネガティブ：float 0.0〜5.0 の範囲', priority: 1 },
   { property: '"positive":ポジティブ', detail: 'ポジティブ：float 0.0〜5.0 の範囲', priority: 1 },
