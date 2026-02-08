@@ -50,8 +50,9 @@ const run = async () => {
     return [];
   });
 
-  const filtered = history;
-  // .filter(entry => Number.isInteger(entry?.score) && entry.score >= 0)
+  const isNumber = v => Number.parseFloat(v) === v * 1;
+  const filtered = history
+  .filter(entry => isNumber(entry.penalty) && entry.penalty === 0);
   // .slice(-30);
 
   logger.info(JSON.stringify(filtered, null, 2));

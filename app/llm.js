@@ -37,11 +37,20 @@ ${useData.map(d => `${d.detail}`).join('\n')}
 説明や理由やは不要です。
 `;
 
-const normalize = item => {
+const adjuster = item => {
   const isNumber = v => Number.parseFloat(v) === v * 1;
-  const scaler = v => Number.parseFloat(Math.min(5, Math.max(0, v - 2) * 5 / 3).toFixed(2), 10);
+  const scaler = v => Math.min(5, Math.max(0, v - 2) * 5 / 3);
   Object.keys(item).filter(key => isNumber(item[key]))
   .forEach(key => { item[key] = scaler(item[key]); });
+  return item;
+};
+
+const normalize = item => {
+  const isNumber = v => Number.parseFloat(v) === v * 1;
+  const toFixed = v => Number.parseFloat(v.toFixed(2), 10);
+  Object.keys(item).filter(key => isNumber(item[key]))
+  .forEach(key => { item[key] = toFixed(item[key]); });
+  return item;
 };
 
 const store = {};
@@ -58,7 +67,7 @@ export const aiCalc = async title => {
   if (!ai.newsworthiness && ai.newsworthiness !== 0) {
     Object.assign(ai, await calcScore(content), { model: 'llama' });
   }
-  normalize(ai);
+  adjuster(ai);
   const logic = extractKeywords(title);
   const sum = { subjectivity: 0, penalty: 0 };
   sum.penalty += ai.personal ?? 0;
@@ -78,12 +87,14 @@ export const aiCalc = async title => {
     delete ai.positive;
     delete ai.negative;
   }
-  sum.preliminary = ai.newsworthiness + ai.impact - Number.parseFloat(sum.subjectivity.toFixed(2), 10);
+  sum.preliminary = ai.newsworthiness + ai.impact - sum.subjectivity;
   sum.score = Math.max(0, sum.preliminary - sum.penalty);
   if (!sum.score && sum.score !== 0) {
     sum.score = Math.max(0, 3 - logic.noisy.length + logic.emergency.length * 1.5);
   }
-  return { ...ai, ...logic, ...sum };
+  return normalize({
+    ...ai, ...logic, ...sum,
+  });
 };
 
 export default {
