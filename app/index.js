@@ -43,7 +43,7 @@ const formatTimestamp = (ts = Date.now(), withoutTimezone = false) => {
     second: '2-digit',
   }).format(new Date(ts));
   if (withoutTimezone) return timestamp;
-  return `${timestamp}+9`;
+  return `${timestamp}+09:00`;
 };
 
 export class App {

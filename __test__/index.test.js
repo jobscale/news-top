@@ -419,7 +419,7 @@ describe('News-Top Application Tests', () => {
           {
             Title: '東京で大雨警報が発令',
             headline: true,
-            timestamp: '2026-02-07 15:00:00+9',
+            timestamp: '2026-02-07 15:00:00+09:00',
           },
         ];
 
