@@ -97,7 +97,7 @@ export class TimeSignal {
     const [hh, mm] = time.split(':');
     const icon = `/png-clock/${hh}_${mm}.png`;
     const expired = formatTimestamp(opts.target.add(22, 'second'));
-    const holidays = await getHoliday();
+    const holidays = await getHoliday(dayjs().add(1, 'hour'));
     const body = [
       `It's ${timestamp} o'clock`,
       '',
