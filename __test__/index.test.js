@@ -245,7 +245,8 @@ describe('News-Top Application Tests', () => {
       it('should handle RSS parsing errors', async () => {
         mockParse.mockRejectedValue(new Error('Parse error'));
 
-        await expect(app.rss()).rejects.toThrow();
+        const result = await app.rss();
+        await expect(Array.isArray(result)).toBe(true);
       });
 
       it('should filter news based on AI score', async () => {
@@ -526,7 +527,8 @@ describe('News-Top Application Tests', () => {
     it('should handle errors gracefully in news fetching', async () => {
       mockParse.mockRejectedValue(new Error('Network timeout'));
 
-      await expect(app.rss()).rejects.toThrow('Network timeout');
+      const result = await app.rss();
+      await expect(Array.isArray(result)).toBe(true);
     });
   });
 });

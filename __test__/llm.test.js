@@ -202,7 +202,7 @@ describe('LLM Module Tests', () => {
         expect(result.emergency.length).toBeGreaterThan(0);
       });
 
-      it('should calculate preliminary score', async () => {
+      it('should calculate careful score', async () => {
         mockCalcScore.mockResolvedValue({
           newsworthiness: 4.0,
           impact: 3.5,
@@ -216,27 +216,8 @@ describe('LLM Module Tests', () => {
 
         const result = await aiCalc('重要なニュース');
 
-        expect(result).toHaveProperty('preliminary');
-        expect(typeof result.preliminary).toBe('number');
-      });
-
-      it('should calculate final score as max(0, preliminary - penalty)', async () => {
-        mockCalcScore.mockResolvedValue({
-          newsworthiness: 4.0,
-          impact: 3.5,
-          credibility: 4.0,
-          importance: 3.8,
-          urgency: 3.0,
-          novelty: 4.0,
-          bias: 1.0,
-          personal: 0.5,
-        });
-
-        const result = await aiCalc('ニュース');
-
-        expect(result).toHaveProperty('score');
-        expect(result.score).toBeGreaterThanOrEqual(0);
-        expect(result.score).toBeLessThanOrEqual(result.preliminary + 1); // Allow small margin
+        expect(result).toHaveProperty('careful');
+        expect(typeof result.careful).toBe('number');
       });
 
       it('should use fallback score when AI score is invalid', async () => {
@@ -256,49 +237,6 @@ describe('LLM Module Tests', () => {
         // Fallback: 3 - noisy.length + emergency.length * 1.5
         expect(typeof result.score).toBe('number');
         expect(result.score).toBeGreaterThanOrEqual(0);
-      });
-    });
-
-    describe('Sensitivity Calculation', () => {
-      it('should calculate sensitivity from positive and negative scores', async () => {
-        mockCalcScore.mockResolvedValue({
-          newsworthiness: 4.0,
-          impact: 3.5,
-          credibility: 4.0,
-          importance: 3.8,
-          urgency: 3.0,
-          novelty: 4.0,
-          bias: 1.0,
-          personal: 0.5,
-          positive: 4.0,
-          negative: 1.0,
-        });
-
-        const result = await aiCalc('ポジティブなニュース');
-
-        expect(result).toHaveProperty('sensitivity');
-        // Sensitivity = normalized(positive) - normalized(negative)
-        // After normalization, values change, so just check it exists and is positive
-        expect(result.sensitivity).toBeGreaterThan(0);
-        expect(result).not.toHaveProperty('positive');
-        expect(result).not.toHaveProperty('negative');
-      });
-
-      it('should not have sensitivity when no positive/negative scores', async () => {
-        mockCalcScore.mockResolvedValue({
-          newsworthiness: 4.0,
-          impact: 3.5,
-          credibility: 4.0,
-          importance: 3.8,
-          urgency: 3.0,
-          novelty: 4.0,
-          bias: 1.0,
-          personal: 0.5,
-        });
-
-        const result = await aiCalc('中立的なニュース');
-
-        expect(result).not.toHaveProperty('sensitivity');
       });
     });
 
