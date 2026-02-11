@@ -1,5 +1,7 @@
 import Parser from 'rss-parser';
 
+const logger = console;
+
 const list = [
   'https://www.asahi.com/rss/asahi/newsheadlines.rdf',
   'https://www.asahi.com/rss/asahi/business.rdf',
@@ -16,7 +18,10 @@ export const newsFetch = async () => {
   const titles = [];
   for (const url of list) {
     const [, media] = url.split('.');
-    const { items } = await parser.parseURL(url);
+    const { items } = await parser.parseURL(url).catch(e => {
+      logger.error({ url, ...e });
+      return { items: [] };
+    });
     const anchorList = items.map(item => {
       const href = item.link;
       return { title: item.title.trim(), href, media };
