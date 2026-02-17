@@ -157,20 +157,23 @@ export class App {
       return [];
     }))
     .filter(v => v.timestamp >= LIMIT);
-    const ai = await aiCalc(Title);
-    const detail = JSON.stringify({ ...ai, title: undefined, media }, null, 2);
-    ai.headline = true;
-    const titles = history.filter(v => v.headline).map(v => v.Title);
-    ai.duplicate = this.hasDuplicate(Title, titles, 0.4);
+    const ai = { headline: true };
+    const titles = history.filter(v => v.newsworthiness).map(v => v.Title);
+    ai.duplicate = this.hasDuplicate(Title, titles, 0.6);
     if (ai.duplicate) ai.headline = false;
-    if (ai.score < 4) ai.headline = false;
+    if (ai.headline) Object.assign(ai, await aiCalc(Title));
+    if ((ai.score ?? 0) < 4) ai.headline = false;
     const news = {
-      Title,
-      ...ai,
-      timestamp: formatTimestamp(),
+      Title, ...ai, timestamp: formatTimestamp(),
     };
     logger.info({ news });
     history.push(JSON.parse(JSON.stringify(news)));
+    const detail = JSON.stringify({
+      ...ai,
+      duplicate: undefined,
+      headline: undefined,
+      media,
+    }, null, 2);
     const cache = {};
     const compress = () => {
       cache.compressed = zlib.gzipSync(JSON.stringify(history)).toString('base64');
