@@ -68,6 +68,7 @@ export class App {
         if (title) {
           return [[`<${anchor.href}|${title}>`, '```', score, '```'].join('\n')];
         }
+        if (dayjs().minute() >= 58) break;
       }
       return [];
     });

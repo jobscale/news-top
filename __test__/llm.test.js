@@ -44,7 +44,7 @@ describe('LLM Module Tests', () => {
         mockCalcScore.mockResolvedValue({
           newsworthiness: 4.0,
           impact: 3.5,
-          credibility: 4.0,
+          certainty: 4.0,
           importance: 3.8,
           urgency: 3.0,
           novelty: 4.2,
@@ -67,7 +67,7 @@ describe('LLM Module Tests', () => {
         mockCalcScore.mockResolvedValue({
           newsworthiness: 7.0, // Should be normalized to 5.0
           impact: 5.0, // Should be normalized to 3.0
-          credibility: 2.0, // Should be normalized to 0.0
+          certainty: 2.0, // Should be normalized to 0.0
           importance: 4.0, // Should be normalized to ~2.0
           urgency: 3.5,
           novelty: 4.5,
@@ -80,7 +80,7 @@ describe('LLM Module Tests', () => {
         // Check that normalization occurred
         expect(result.newsworthiness).toBeLessThanOrEqual(5);
         expect(result.impact).toBeLessThanOrEqual(5);
-        expect(result.credibility).toBeGreaterThanOrEqual(0);
+        expect(result.certainty).toBeGreaterThanOrEqual(0);
       });
     });
 
@@ -89,7 +89,7 @@ describe('LLM Module Tests', () => {
         mockCalcScore.mockResolvedValue({
           newsworthiness: 4.0,
           impact: 3.5,
-          credibility: 4.0,
+          certainty: 4.0,
           importance: 3.8,
           urgency: 3.0,
           novelty: 4.0,
@@ -109,7 +109,7 @@ describe('LLM Module Tests', () => {
         mockCalcScore.mockResolvedValue({
           newsworthiness: 4.0,
           impact: 3.5,
-          credibility: 4.0,
+          certainty: 4.0,
           importance: 3.8,
           urgency: 3.0,
           novelty: 4.0,
@@ -129,7 +129,7 @@ describe('LLM Module Tests', () => {
         mockCalcScore.mockResolvedValue({
           newsworthiness: 4.0,
           impact: 3.5,
-          credibility: 4.0,
+          certainty: 4.0,
           importance: 3.8,
           urgency: 3.0,
           novelty: 4.0,
@@ -149,7 +149,7 @@ describe('LLM Module Tests', () => {
         mockCalcScore.mockResolvedValue({
           newsworthiness: 4.0,
           impact: 3.5,
-          credibility: 2.0, // Low credibility increases subjectivity
+          certainty: 2.0, // Low certainty increases subjectivity
           importance: 2.0, // Low importance increases subjectivity
           urgency: 2.0, // Low urgency increases subjectivity
           novelty: 2.0, // Low novelty increases subjectivity
@@ -167,7 +167,7 @@ describe('LLM Module Tests', () => {
         mockCalcScore.mockResolvedValue({
           newsworthiness: 4.0,
           impact: 3.5,
-          credibility: 4.0,
+          certainty: 4.0,
           importance: 3.8,
           urgency: 3.0,
           novelty: 4.0,
@@ -187,7 +187,7 @@ describe('LLM Module Tests', () => {
         mockCalcScore.mockResolvedValue({
           newsworthiness: 4.5,
           impact: 4.0,
-          credibility: 4.0,
+          certainty: 4.0,
           importance: 4.0,
           urgency: 4.0,
           novelty: 4.0,
@@ -206,7 +206,7 @@ describe('LLM Module Tests', () => {
         mockCalcScore.mockResolvedValue({
           newsworthiness: 4.0,
           impact: 3.5,
-          credibility: 4.0,
+          certainty: 4.0,
           importance: 3.8,
           urgency: 3.0,
           novelty: 4.0,
@@ -223,7 +223,7 @@ describe('LLM Module Tests', () => {
       it('should use fallback score when AI score is invalid', async () => {
         mockCalcScore.mockResolvedValue({
           // Missing newsworthiness and impact
-          credibility: 4.0,
+          certainty: 4.0,
           importance: 3.8,
           urgency: 3.0,
           novelty: 4.0,
@@ -245,7 +245,7 @@ describe('LLM Module Tests', () => {
         mockCalcScore.mockResolvedValue({
           newsworthiness: 0.0,
           impact: 0.0,
-          credibility: 0.0,
+          certainty: 0.0,
           importance: 0.0,
           urgency: 0.0,
           novelty: 0.0,
@@ -263,7 +263,7 @@ describe('LLM Module Tests', () => {
         mockCalcScore.mockResolvedValue({
           newsworthiness: 4.0,
           impact: 3.5,
-          credibility: 4.0,
+          certainty: 4.0,
           importance: 3.8,
           urgency: 3.0,
           novelty: 4.0,
@@ -282,7 +282,7 @@ describe('LLM Module Tests', () => {
         mockCalcScore.mockResolvedValue({
           newsworthiness: 4.0,
           impact: 3.5,
-          credibility: 4.0,
+          certainty: 4.0,
           importance: 3.8,
           urgency: 3.0,
           novelty: 4.0,
@@ -308,7 +308,7 @@ describe('LLM Module Tests', () => {
         mockCalcScore.mockResolvedValue({
           newsworthiness: 4.5,
           impact: 4.5,
-          credibility: 4.5,
+          certainty: 4.5,
           importance: 4.5,
           urgency: 4.0,
           novelty: 4.0,
@@ -327,7 +327,7 @@ describe('LLM Module Tests', () => {
         mockCalcScore.mockResolvedValue({
           newsworthiness: 2.0,
           impact: 2.0,
-          credibility: 3.0,
+          certainty: 3.0,
           importance: 2.0,
           urgency: 1.0,
           novelty: 2.0,
@@ -345,7 +345,7 @@ describe('LLM Module Tests', () => {
         mockCalcScore.mockResolvedValue({
           newsworthiness: 5.0,
           impact: 5.0,
-          credibility: 5.0,
+          certainty: 5.0,
           importance: 5.0,
           urgency: 5.0,
           novelty: 4.5,
