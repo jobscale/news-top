@@ -52,7 +52,7 @@ const run = async () => {
 
   const isNumber = v => Number.parseFloat(v) === v * 1;
   const filtered = history
-  .filter(entry => isNumber(entry.penalty) && entry.penalty === 0);
+  .filter(entry => isNumber(entry.personal) && entry.personal === 0);
   // .slice(-30);
 
   logger.info(JSON.stringify(filtered, null, 2));
