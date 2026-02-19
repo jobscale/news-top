@@ -70,17 +70,18 @@ export const aiCalc = async title => {
   adjuster(ai);
   const logic = extractKeywords(title);
   const sum = { careful: 0, subjectivity: 0, penalty: 0 };
-  sum.careful += ai.newsworthiness + ai.impact;
-  sum.careful += ai.importance;
+  sum.careful += ai.newsworthiness;
+  sum.careful += ai.impact * 1.2;
+  sum.careful += ai.importance * 1.1;
+  sum.penalty += logic.emergency.length * 1.7;
   sum.penalty += ai.personal ?? 0;
   sum.penalty += dataset.noisy.filter(word => ai.location?.includes(word)).length;
   sum.penalty += dataset.noisy.filter(word => ai.category?.includes(word)).length;
   sum.penalty += dataset.noisy.filter(word => ai.influence?.includes(word)).length;
   sum.penalty += logic.noisy.length;
-  sum.penalty -= logic.emergency.length * 1.5;
-  sum.subjectivity += (5 - ai.urgency) * 0.7;
-  sum.subjectivity += (5 - ai.certainty) * 0.4;
-  sum.subjectivity += (5 - ai.novelty) * 0.3;
+  sum.subjectivity += (5 - ai.urgency) * 0.8;
+  sum.subjectivity += (5 - ai.certainty) * 0.6;
+  sum.subjectivity += (5 - ai.novelty) * 0.4;
   sum.subjectivity += ai.bias * 0.5;
   if (ai.positive && ai.negative) {
     sum.sensitivity = ai.positive - ai.negative;

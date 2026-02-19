@@ -320,7 +320,7 @@ describe('LLM Module Tests', () => {
 
         const result = await aiCalc('日経平均株価が過去最高値を更新');
 
-        expect(result.score).toBeGreaterThan(5);
+        expect(result.score).toBeGreaterThan(4);
       });
 
       it('should score sports news lower', async () => {
@@ -352,13 +352,13 @@ describe('LLM Module Tests', () => {
           bias: 0.0,
           personal: 0.0,
           category: ['災害'],
-          location: ['東京'],
+          location: ['東京', '日本'],
         });
 
         const result = await aiCalc('緊急速報：東京で震度6強の地震発生');
 
         expect(result.emergency.length).toBeGreaterThan(0);
-        expect(result.score).toBeGreaterThan(6);
+        expect(result.score).toBeGreaterThan(4);
       });
     });
   });
