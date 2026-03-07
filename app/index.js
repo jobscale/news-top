@@ -222,7 +222,7 @@ export class App {
     ), null, 2));
     const sales = priseList.filter(item => {
       if (ts >= '11:00' && ts <= '11:10') return true;
-      return item.price <= item.sale;
+      return item.price && item.price <= item.sale;
     }).map(item => `${item.name} <${item.url}|${item.price.toLocaleString()}>`);
     return sales;
   }
