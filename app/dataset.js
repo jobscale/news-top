@@ -1,14 +1,20 @@
-const emergency = [
+const impact = [
   '地震', '震度', '噴火', 'テロ', '暗殺',
   '洪水', '水害', '氾濫', '決壊', '豪雨', '落雷',
   '寒波', '降雪', '積雪', '障害', '停電', '断水', '原子',
   '買収', '合併', '上場', '株価', '為替',
   '大阪符', '大阪市', '大阪で', '大阪に', '関西', '西日本',
   '未曾有', '記録的', '壊滅的',
-  '日経平均', '緊急事態', '緊急速報', '通信障害', '好適環境水',
+  '日経平均', '緊急事態', '緊急速報', '好適環境水',
   '大災害', '大規模', '大規模災害',
-  'ライフライン', 'インフラ', 'サイバー攻撃', 'システム障害',
-  'ビール', 'ビール', 'ビール',
+];
+
+const importance = [
+  'ライフライン', 'ライフライン', 'インフラ', 'インフラ',
+  '通信障害', '通信障害', 'ネットワーク障害', 'ネットワーク障害',
+  'システム障害', 'システム障害', 'サイバー攻撃', 'サイバー攻撃',
+  'ビール', 'ビール', 'データセンター', 'データセンター',
+  '核融合', '核融合',
 ];
 
 const uncertain = [
@@ -65,6 +71,7 @@ const politics = [
 
 const international = [
   '北朝鮮', '中国', '韓国', 'ウクライナ', 'ロシア', 'ガザ', 'トランプ',
+  'イラン', '最高指導者',
   'テスト', '不正', '背景', 'カリスマ', 'リーダー', '集団墓地',
   '支援', '空爆', '兵士', '撤退', '貿易', '関税', '提携', '抗議',
   '安保', '衝突', '反発', '反逆', '交渉', '停戦', '進展', '国境',
@@ -138,7 +145,7 @@ const other = [
   '上昇', '減少',
 ];
 
-export const detail = {
+export const noisy = {
   uncertain,
   sports,
   talent,
@@ -152,9 +159,14 @@ export const detail = {
   other,
 };
 
+const emergency = {
+  impact,
+  importance,
+};
+
 export const dataset = {
-  emergency,
-  noisy: Object.values(detail).flat(),
+  emergency: Object.values(emergency).flat(),
+  noisy: Object.values(noisy).flat(),
 };
 
 export const extractKeywords = title => ({
