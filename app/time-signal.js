@@ -22,11 +22,10 @@ const formatTimestamp = (ts = Date.now(), withoutTimezone = false) => {
   return `${timestamp}+09:00`;
 };
 
-const sliceByUnit = (array, unit) => {
-  const count = Math.ceil(array.length / unit);
-  return new Array(count).fill()
-  .map((_, i) => array.slice(unit * i, unit * (i + 1)));
-};
+const chunkByUnit = (arr, size) => arr.reduce((acc, _, i) => {
+  if (i % size === 0) acc.push(arr.slice(i, i + size));
+  return acc;
+}, []);
 
 export class TimeSignal {
   render(template, data) {
@@ -108,7 +107,7 @@ export class TimeSignal {
     const payload = {
       title: 'Time Signal', expired, body, icon,
     };
-    const unitUsers = sliceByUnit(Object.values(this.users), 10);
+    const unitUsers = chunkByUnit(Object.values(this.users), 10);
     for (const unit of unitUsers) {
       await this.pushSignal(payload, unit);
     }
