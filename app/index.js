@@ -10,7 +10,6 @@ import { newsFetch as rssNewsFetch } from './rss.js';
 import { newsFetch as yahooNewsFetch } from './yahoo.js';
 import { newsFetch as nikkeiNewsFetch } from './nikkei.js';
 import { newsFetch as asahiNewsFetch } from './asahi.js';
-import { priceFetch as amazonPriceFetch } from './amazon.js';
 
 const logger = new Logger({ noPathName: true, timestamp: true });
 const auth = JSON.parse(Buffer.from(env.auth, 'base64').toString());
@@ -53,8 +52,10 @@ export class App {
       for (const anchor of anchorList) {
         const [score, title] = await this.filterItem(anchor.title, anchor.media);
         if (title) {
-          return [[`<${anchor.href}|${title}>`, '```', score, '```'].join('\n')];
+          const block = [`<${anchor.href}|${title}>`, '```', score, '```'].join('\n');
+          return [{ text: title, block }];
         }
+        if (dayjs().minute() >= 58) break;
       }
       return [];
     });
@@ -66,7 +67,8 @@ export class App {
       for (const anchor of anchorList) {
         const [score, title] = await this.filterItem(anchor.title, anchor.media);
         if (title) {
-          return [[`<${anchor.href}|${title}>`, '```', score, '```'].join('\n')];
+          const block = [`<${anchor.href}|${title}>`, '```', score, '```'].join('\n');
+          return [{ text: title, block }];
         }
         if (dayjs().minute() >= 58) break;
       }
@@ -80,8 +82,10 @@ export class App {
       for (const anchor of anchorList) {
         const [score, title] = await this.filterItem(anchor.title, anchor.media);
         if (title) {
-          return [[`<${anchor.href}|${title}>`, '```', score, '```'].join('\n')];
+          const block = [`<${anchor.href}|${title}>`, '```', score, '```'].join('\n');
+          return [{ text: title, block }];
         }
+        if (dayjs().minute() >= 58) break;
       }
       return [];
     });
@@ -93,8 +97,10 @@ export class App {
       for (const anchor of anchorList) {
         const [score, title] = await this.filterItem(anchor.title, anchor.media);
         if (title) {
-          return [[`<${anchor.href}|${title}>`, '```', score, '```'].join('\n')];
+          const block = [`<${anchor.href}|${title}>`, '```', score, '```'].join('\n');
+          return [{ text: title, block }];
         }
+        if (dayjs().minute() >= 58) break;
       }
       return [];
     });
@@ -212,19 +218,6 @@ export class App {
     }
     const maxLength = Math.max(setA.length, b.length);
     return match / maxLength; // 一致率
-  }
-
-  async amazon(ts) {
-    if (ts < '08:00' || ts > '20:10') return [];
-    const priseList = await amazonPriceFetch();
-    logger.info(ts, JSON.stringify(priseList.map(
-      item => `${item.name} = ${item.price.toLocaleString()} / ${item.sale.toLocaleString()}`,
-    ), null, 2));
-    const sales = priseList.filter(item => {
-      if (ts >= '11:00' && ts <= '11:10') return true;
-      return item.price && item.price <= item.sale;
-    }).map(item => `${item.name} <${item.url}|${item.price.toLocaleString()}>`);
-    return sales;
   }
 }
 

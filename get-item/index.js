@@ -64,4 +64,8 @@ const run = async () => {
   logger.info(JSON.stringify(filtered, null, 2));
 };
 
-run().catch(logger.error);
+if (process.argv[2] === 'remove') {
+  remove().catch(logger.error);
+} else {
+  run().catch(logger.error);
+}

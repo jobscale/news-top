@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import { Logger } from '@jobscale/logger';
 import './env.js';
 import { app as news } from './app/index.js';
@@ -26,22 +25,20 @@ class App {
     for (const row of rows) {
       if (!opts.first) opts.first = true;
       else await wait(8000);
+      const block = {
+        type: 'section',
+        fields: [
+          { type: 'mrkdwn', text: row.block },
+        ],
+      };
       await this.postSlack({
         channel: '#random',
         icon_emoji: ':rolled_up_newspaper:',
         username,
-        text: row,
+        text: row.text,
+        blocks: [block],
       });
     }
-  }
-
-  async amz(ts) {
-    const rows = [
-      ...await news.amazon(ts).catch(e => { logger.error(e); return []; }),
-    ];
-    if (!rows.length) return;
-    const text = rows.join('\n');
-    await this.post([text], 'EC');
   }
 
   async news() {
@@ -55,11 +52,7 @@ class App {
   }
 
   async start() {
-    const [, time] = dayjs().add(9, 'hour').toISOString().split('T');
-    const [hh, mm] = time.split(':');
-    const ts = `${hh}:${mm}`;
     await this.news();
-    await this.amz(ts);
     await timeSignal.startTimeSignal();
   }
 }

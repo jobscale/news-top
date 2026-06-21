@@ -145,61 +145,6 @@ describe('News-Top Application Tests', () => {
     });
   });
 
-  describe('Amazon Price Monitoring', () => {
-    describe('amazon(ts)', () => {
-      it('should return empty array for time before 08:00', async () => {
-        const result = await app.amazon('07:59');
-        expect(result).toEqual([]);
-      });
-
-      it('should return empty array for time after 20:10', async () => {
-        const result = await app.amazon('20:11');
-        expect(result).toEqual([]);
-      });
-
-      it('should fetch prices during valid time range', async () => {
-        const mockDocument = {
-          querySelector: jest.fn(() => ({
-            textContent: '¥15,000',
-          })),
-        };
-
-        mockFetch.mockResolvedValue({
-          text: () => Promise.resolve('<html></html>'),
-        });
-
-        const { JSDOM } = await import('jsdom');
-        JSDOM.mockImplementation(() => ({
-          window: { document: mockDocument },
-        }));
-
-        const result = await app.amazon('10:00');
-        expect(Array.isArray(result)).toBe(true);
-      });
-
-      it('should detect sales at 11:00-11:10', async () => {
-        const mockDocument = {
-          querySelector: jest.fn(() => ({
-            textContent: '¥18,000',
-          })),
-        };
-
-        mockFetch.mockResolvedValue({
-          text: () => Promise.resolve('<html></html>'),
-        });
-
-        const { JSDOM } = await import('jsdom');
-        JSDOM.mockImplementation(() => ({
-          window: { document: mockDocument },
-        }));
-
-        const result = await app.amazon('11:05');
-        expect(Array.isArray(result)).toBe(true);
-        expect(result.length).toBeGreaterThan(0);
-      });
-    });
-  });
-
   describe('News Fetching Methods', () => {
     beforeEach(() => {
       // Setup common mocks for news fetching
