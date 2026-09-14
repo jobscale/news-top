@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "news-top",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "news",
   "keywords": [
     "news"
@@ -35,9 +35,6 @@
     "rss-parser": "^3.13.0",
     "undici": "^8.10.2",
     "web-push": "^3.6.7"
-  },
-  "overrides": {
-    "html-encoding-sniffer": "^6.0.0"
   },
   "devDependencies": {
     "@jobscale/eslint-plugin-standard": "^0.1.4",
