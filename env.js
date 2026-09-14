@@ -1,4 +1,4 @@
 delete process.env.AWS_PROFILE;
 if (!process.env.ENV) process.env.ENV = 'dev';
 // if (!process.env.LLAMA) process.env.LLAMA = 'n100-gemma-it';
-if (!process.env.LLAMA) process.env.LLAMA = 'dark-gemma-it';
+// if (!process.env.LLAMA) process.env.LLAMA = 'dark-gemma-it';
