@@ -1,8 +1,8 @@
-import { logger } from '@jobscale/logger';
 import {
   SSMClient, GetParameterCommand, PutParameterCommand,
   GetParametersByPathCommand, DeleteParameterCommand,
 } from '@aws-sdk/client-ssm';
+import { logger } from '@jobscale/create-logger';
 import { connect } from './connect.js';
 
 const { ENV } = process.env;

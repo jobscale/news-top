@@ -22,7 +22,7 @@ jest.unstable_mockModule('@aws-sdk/lib-dynamodb', () => ({
 }));
 
 jest.unstable_mockModule('@aws-sdk/util-dynamodb', () => ({
-  marshall: jest.fn((obj) => obj),
+  marshall: jest.fn(obj => obj),
 }));
 
 // Mock RSS Parser
@@ -148,7 +148,7 @@ describe('News-Top Application Tests', () => {
   describe('News Fetching Methods', () => {
     beforeEach(() => {
       // Setup common mocks for news fetching
-      mockSend.mockImplementation((command) => {
+      mockSend.mockImplementation(command => {
         if (command.constructor.name === 'GetCommand') {
           return Promise.resolve({ Item: null });
         }
@@ -439,7 +439,7 @@ describe('News-Top Application Tests', () => {
 
       // Mock DynamoDB - item doesn't exist
       let getCallCount = 0;
-      mockSend.mockImplementation((command) => {
+      mockSend.mockImplementation(command => {
         if (command.constructor.name === 'GetCommand') {
           getCallCount++;
           if (getCallCount === 1) {

@@ -1,12 +1,9 @@
-import { Logger } from '@jobscale/logger';
+import { logger } from '@jobscale/create-logger';
 import './env.js';
 import { app as news } from './app/index.js';
 import { timeSignal } from './app/time-signal.js';
 
-const logger = new Logger({ timestamp: true });
-const wait = ms => new Promise(resolve => { setTimeout(resolve, ms); });
-
-class App {
+export class App {
   postSlack(body) {
     const url = 'https://jsx.jp/api/slack';
     const options = {
@@ -24,7 +21,7 @@ class App {
     const opts = {};
     for (const row of rows) {
       if (!opts.first) opts.first = true;
-      else await wait(8000);
+      else await new Promise(resolve => { setTimeout(resolve, 8000); });
       const block = {
         type: 'section',
         fields: [
@@ -57,5 +54,6 @@ class App {
   }
 }
 
-new App().start()
+export const app = new App();
+export const pending = app.start()
 .catch(e => logger.error(e));

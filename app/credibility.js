@@ -38,7 +38,7 @@ export const calcScore = async content => {
       return {};
     });
   })
-  .catch(e => logger.warn(e) ?? {})
+  .catch(e => logger.warn(e.cause?.message ?? e.message) ?? {})
   .then(answer => ({ ...answer }))
   .then(answer => ({ ...answer, benchmark: `${(Date.now() - start) / 1000}s` }));
 };

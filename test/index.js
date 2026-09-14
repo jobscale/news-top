@@ -1,13 +1,11 @@
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { readFile } from 'fs/promises';
-import { createLogger } from '@jobscale/logger';
+import { logger } from '@jobscale/create-logger';
 import { aiCalc } from '../app/llm.js';
 
 const filepath = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filepath);
-
-const logger = createLogger('info', { noPathName: true, noType: true });
 
 const main = async () => {
   const titleList = await readFile(path.join(dirname, 'news.txt'), 'utf8')

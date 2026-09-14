@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import { DynamoDBClient, CreateTableCommand, waitUntilTableExists } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
-import { Logger } from '@jobscale/logger';
+import { logger } from '@jobscale/create-logger';
 import { aiCalc } from './llm.js';
 import env from './env.js';
 import { newsFetch as rssNewsFetch } from './rss.js';
@@ -11,7 +11,8 @@ import { newsFetch as yahooNewsFetch } from './yahoo.js';
 import { newsFetch as nikkeiNewsFetch } from './nikkei.js';
 import { newsFetch as asahiNewsFetch } from './asahi.js';
 
-const logger = new Logger({ noPathName: true, timestamp: true });
+const { XDG_SESSION_DESKTOP: DESKTOP } = process.env;
+
 const auth = JSON.parse(Buffer.from(env.auth, 'base64').toString());
 Object.assign(process.env, {
   AWS_REGION: 'ap-northeast-1',
@@ -19,10 +20,12 @@ Object.assign(process.env, {
   AWS_SECRET_ACCESS_KEY: auth.key,
 });
 const TableName = 'News';
-const [, endpoint] = [
-  'https://lo-stack.jsx.jp',
-  process.env.XDG_SESSION_DESKTOP === 'cinnamon' ? 'http://lo-stack.x.jsx.jp:4566' : 'https://lo-stack.x.jsx.jp',
+const defaultEndpoint = DESKTOP === 'cinnamon' ? 'http://lo-stack.x.jsx.jp:4566' : 'https://lo-stack.x.jsx.jp';
+const [endpoint] = [
+  undefined,
+  defaultEndpoint,
   'http://lo-stack.x.jsx.jp:4566',
+  'https://lo-stack.x.jsx.jp',
 ];
 const ddb = new DynamoDBClient({
   maxAttempts: 10,

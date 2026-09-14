@@ -33,6 +33,12 @@ jobs:
         - name: regular
           irregular: ''
           docker_file: Dockerfile
+        - name: lambda
+          irregular: lambda
+          docker_file: lambda/Dockerfile
+        - name: lambda-debian
+          irregular: lambda-debian
+          docker_file: lambda/debian/Dockerfile
 
     permissions:
       contents: read

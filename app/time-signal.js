@@ -1,12 +1,10 @@
 import { createHash } from 'crypto';
 import dayjs from 'dayjs';
 import webPush from 'web-push';
-import { Logger } from '@jobscale/logger';
+import { logger } from '@jobscale/create-logger';
 import { db } from './db.js';
 import { store } from './store.js';
 import { getHoliday } from './holiday.js';
-
-const logger = new Logger({ timestamp: true, noPathName: true });
 
 const formatTimestamp = (ts = Date.now(), withoutTimezone = false) => {
   const timestamp = new Intl.DateTimeFormat('sv-SE', {
