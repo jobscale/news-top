@@ -14,11 +14,9 @@ import { newsFetch as asahiNewsFetch } from './asahi.js';
 const { XDG_SESSION_DESKTOP: DESKTOP } = process.env;
 
 const auth = JSON.parse(Buffer.from(env.auth, 'base64').toString());
-Object.assign(process.env, {
-  AWS_REGION: 'ap-northeast-1',
-  AWS_ACCESS_KEY_ID: auth.id,
-  AWS_SECRET_ACCESS_KEY: auth.key,
-});
+if (!auth.id) auth.id = 'test';
+if (!auth.key) auth.key = 'test';
+if (!process.env.AWS_REGION) process.env.AWS_REGION = auth.region ?? 'ap-northeast-1';
 const TableName = 'News';
 const defaultEndpoint = DESKTOP === 'cinnamon' ? 'http://lo-stack.x.jsx.jp:4566' : 'https://lo-stack.x.jsx.jp';
 const [endpoint] = [
@@ -27,10 +25,17 @@ const [endpoint] = [
   'http://lo-stack.x.jsx.jp:4566',
   'https://lo-stack.x.jsx.jp',
 ];
-const ddb = new DynamoDBClient({
-  maxAttempts: 10,
+const config = {
   // logger,
   endpoint,
+  credentials: {
+    accessKeyId: auth.id,
+    secretAccessKey: auth.key,
+  },
+};
+const ddb = new DynamoDBClient({
+  maxAttempts: 10,
+  ...config,
 });
 const ddbDoc = new DynamoDBDocumentClient(ddb);
 
