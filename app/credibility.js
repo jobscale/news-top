@@ -19,7 +19,7 @@ const llmFetch = async content => {
 export const calcScore = async content => {
   const start = Date.now();
   return llmFetch({
-    model: server.model,
+    model: server?.model ?? 'model',
     messages: [{
       role: 'user',
       content: [
