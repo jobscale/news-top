@@ -4,9 +4,10 @@ const { LLAMA, DEBUG } = process.env;
 const logger = console;
 
 if (DEBUG) logger.info(JSON.stringify(Object.keys(servers)));
-const server = servers[LLAMA || 'dark-gemma-it'];
+const server = servers[LLAMA];
 
 const llmFetch = async content => {
+  if (!server) throw new Error('no server');
   const res = await fetch(server.endpoint, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
