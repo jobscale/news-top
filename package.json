@@ -36,6 +36,9 @@
     "undici": "^8.10.2",
     "web-push": "^3.6.7"
   },
+  "overrides": {
+    "html-encoding-sniffer": "^6.0.0"
+  },
   "devDependencies": {
     "@jobscale/eslint-plugin-standard": "^0.1.4",
     "eslint": "^10.10.0",
