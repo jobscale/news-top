@@ -58,12 +58,12 @@ export class App {
     return rssNewsFetch()
     .then(async anchorList => {
       for (const anchor of anchorList) {
+        if (dayjs().minute() >= 58) break;
         const [score, title] = await this.filterItem(anchor.title, anchor.media);
         if (title) {
           const block = [`<${anchor.href}|${title}>`, '```', score, '```'].join('\n');
           return [{ text: title, block }];
         }
-        if (dayjs().minute() >= 58) break;
       }
       return [];
     });
@@ -73,12 +73,12 @@ export class App {
     return yahooNewsFetch()
     .then(async anchorList => {
       for (const anchor of anchorList) {
+        if (dayjs().minute() >= 58) break;
         const [score, title] = await this.filterItem(anchor.title, anchor.media);
         if (title) {
           const block = [`<${anchor.href}|${title}>`, '```', score, '```'].join('\n');
           return [{ text: title, block }];
         }
-        if (dayjs().minute() >= 58) break;
       }
       return [];
     });
@@ -88,12 +88,12 @@ export class App {
     return nikkeiNewsFetch()
     .then(async anchorList => {
       for (const anchor of anchorList) {
+        if (dayjs().minute() >= 58) break;
         const [score, title] = await this.filterItem(anchor.title, anchor.media);
         if (title) {
           const block = [`<${anchor.href}|${title}>`, '```', score, '```'].join('\n');
           return [{ text: title, block }];
         }
-        if (dayjs().minute() >= 58) break;
       }
       return [];
     });
@@ -103,12 +103,12 @@ export class App {
     return asahiNewsFetch()
     .then(async anchorList => {
       for (const anchor of anchorList) {
+        if (dayjs().minute() >= 58) break;
         const [score, title] = await this.filterItem(anchor.title, anchor.media);
         if (title) {
           const block = [`<${anchor.href}|${title}>`, '```', score, '```'].join('\n');
           return [{ text: title, block }];
         }
-        if (dayjs().minute() >= 58) break;
       }
       return [];
     });

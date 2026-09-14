@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { logger } from '@jobscale/create-logger';
 import './env.js';
 import { app as news } from './app/index.js';
@@ -39,6 +40,7 @@ export class App {
   }
 
   async news() {
+    if (dayjs().minute() >= 58) return;
     const rows = [];
     rows.push(...await news.rss().catch(e => { logger.error(e); return []; }));
     rows.push(...await news.asahi().catch(e => { logger.error(e); return []; }));
