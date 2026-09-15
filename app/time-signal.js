@@ -58,7 +58,7 @@ export class TimeSignal {
   }
 
   async timeSignal() {
-    const MAX_MINUTES = 7 * 60 * 1000;
+    const MAX_MINUTES = 5 * 60 * 1000;
     const opts = {
       time: dayjs().add(1, 'hour').startOf('hour'),
     };
@@ -121,8 +121,4 @@ export class TimeSignal {
 }
 
 export const timeSignal = new TimeSignal();
-
-export default {
-  TimeSignal,
-  timeSignal,
-};
+export default { TimeSignal, timeSignal };
