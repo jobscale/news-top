@@ -2,23 +2,10 @@ import { createHash } from 'crypto';
 import dayjs from 'dayjs';
 import webPush from 'web-push';
 import { logger } from '@jobscale/create-logger';
+import { formatTimestamp } from '@jobscale/timestamp';
 import { db } from './db.js';
 import { store } from './store.js';
 import { getHoliday } from './holiday.js';
-
-const formatTimestamp = (ts = Date.now(), withoutTimezone = false) => {
-  const timestamp = new Intl.DateTimeFormat('sv-SE', {
-    timeZone: 'Asia/Tokyo',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  }).format(new Date(ts));
-  if (withoutTimezone) return timestamp;
-  return `${timestamp}+09:00`;
-};
 
 const chunkByUnit = (arr, size) => arr.reduce((acc, _, i) => {
   if (i % size === 0) acc.push(arr.slice(i, i + size));
@@ -89,11 +76,11 @@ export class TimeSignal {
       }, 1000);
     });
 
-    const timestamp = formatTimestamp(opts.time);
+    const timestamp = formatTimestamp({ ts: opts.time });
     const [, time] = timestamp.split(/[+ ]/);
     const [hh, mm] = time.split(':');
     const icon = `/v1/png-clock/${hh}_${mm}.png`;
-    const expired = formatTimestamp(opts.target.add(22, 'second'));
+    const expired = formatTimestamp({ ts: opts.target.add(22, 'second') });
     const holidays = await getHoliday(dayjs().add(1, 'hour'));
     const body = [
       `It's ${timestamp} o'clock`,

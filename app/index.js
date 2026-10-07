@@ -4,6 +4,7 @@ import { DynamoDBClient, CreateTableCommand, waitUntilTableExists } from '@aws-s
 import { DynamoDBDocumentClient, PutCommand, GetCommand } from '@aws-sdk/lib-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { logger } from '@jobscale/create-logger';
+import { formatTimestamp } from '@jobscale/timestamp';
 import { aiCalc } from './llm.js';
 import env from './env.js';
 import { newsFetch as rssNewsFetch } from './rss.js';
@@ -38,20 +39,6 @@ const ddb = new DynamoDBClient({
   ...config,
 });
 const ddbDoc = new DynamoDBDocumentClient(ddb);
-
-const formatTimestamp = (ts = Date.now(), withoutTimezone = false) => {
-  const timestamp = new Intl.DateTimeFormat('sv-SE', {
-    timeZone: 'Asia/Tokyo',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  }).format(new Date(ts));
-  if (withoutTimezone) return timestamp;
-  return `${timestamp}+09:00`;
-};
 
 export class App {
   rss() {
@@ -150,9 +137,10 @@ export class App {
       throw e;
     });
     if (Item) return [];
+    const timestamp = formatTimestamp();
     await ddbDoc.send(new PutCommand({
       TableName,
-      Item: { Title },
+      Item: { Title, timestamp },
     }));
 
     const Key = { Title: 'history' };
@@ -164,7 +152,7 @@ export class App {
       if (Array.isArray(history)) return history;
       return JSON.parse(zlib.gunzipSync(Buffer.from(history, 'base64')).toString());
     };
-    const LIMIT = formatTimestamp(dayjs().subtract(90, 'day'));
+    const LIMIT = formatTimestamp({ ts: dayjs().subtract(90, 'day') });
     const history = (await getHistory()
     .catch(e => {
       logger.warn(e.message);
@@ -178,7 +166,7 @@ export class App {
     if (ai.headline) Object.assign(ai, await aiCalc(Title));
     if ((ai.score ?? 0) < 4) ai.headline = false;
     const news = {
-      Title, ...ai, timestamp: formatTimestamp(),
+      Title, ...ai, timestamp,
     };
     logger.info({ news });
     history.push(JSON.parse(JSON.stringify(news)));
