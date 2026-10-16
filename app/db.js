@@ -3,7 +3,6 @@ import {
   GetParametersByPathCommand, DeleteParameterCommand,
 } from '@aws-sdk/client-ssm';
 import { logger } from '@jobscale/create-logger';
-import { connect } from './connect.js';
 
 const { ENV } = process.env;
 
@@ -77,7 +76,6 @@ export class DB {
     if (!this.cache) this.cache = {};
     if (this.cache[tableName]) return this.cache[tableName];
     this.cache[tableName] = new SSMClient({
-      ...await connect.credentials(),
       ...config,
     });
     return this.cache[tableName];
