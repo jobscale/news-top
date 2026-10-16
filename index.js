@@ -1,6 +1,5 @@
 import dayjs from 'dayjs';
 import { logger } from '@jobscale/create-logger';
-import './env.js';
 import { app as news } from './app/index.js';
 import { timeSignal } from './app/time-signal.js';
 

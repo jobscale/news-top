@@ -6,18 +6,14 @@ import { marshall } from '@aws-sdk/util-dynamodb';
 import { logger } from '@jobscale/create-logger';
 import { formatTimestamp } from '@jobscale/timestamp';
 import { aiCalc } from './llm.js';
-import env from './env.js';
 import { newsFetch as rssNewsFetch } from './rss.js';
 import { newsFetch as yahooNewsFetch } from './yahoo.js';
 import { newsFetch as nikkeiNewsFetch } from './nikkei.js';
 import { newsFetch as asahiNewsFetch } from './asahi.js';
 
-const { XDG_SESSION_DESKTOP: DESKTOP } = process.env;
+const { ENV, XDG_SESSION_DESKTOP: DESKTOP } = process.env;
 
-const auth = JSON.parse(Buffer.from(env.auth, 'base64').toString());
-if (!auth.id) auth.id = 'test';
-if (!auth.key) auth.key = 'test';
-if (!process.env.AWS_REGION) process.env.AWS_REGION = auth.region ?? 'ap-northeast-1';
+if (!process.env.AWS_REGION) process.env.AWS_REGION = 'ap-northeast-1';
 const TableName = 'News';
 const defaultEndpoint = DESKTOP === 'cinnamon' ? 'http://lo-stack.x.jsx.jp:4566' : 'https://lo-stack.x.jsx.jp';
 const [endpoint] = [
@@ -30,13 +26,13 @@ const config = {
   // logger,
   endpoint,
   credentials: {
-    accessKeyId: auth.id,
-    secretAccessKey: auth.key,
+    accessKeyId: 'test',
+    secretAccessKey: 'test',
   },
 };
 const ddb = new DynamoDBClient({
   maxAttempts: 10,
-  ...config,
+  ...ENV === 'test' ? config : {},
 });
 const ddbDoc = new DynamoDBDocumentClient(ddb);
 
