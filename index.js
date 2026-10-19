@@ -42,9 +42,9 @@ export class App {
     if (dayjs().minute() >= 58) return;
     const rows = [];
     rows.push(...await news.rss().catch(e => { logger.error(e); return []; }));
-    rows.push(...await news.asahi().catch(e => { logger.error(e); return []; }));
-    rows.push(...await news.nikkei().catch(e => { logger.error(e); return []; }));
-    rows.push(...await news.yahoo().catch(e => { logger.error(e); return []; }));
+    if (!rows.length) rows.push(...await news.asahi().catch(e => { logger.error(e); return []; }));
+    if (!rows.length) rows.push(...await news.nikkei().catch(e => { logger.error(e); return []; }));
+    if (!rows.length) rows.push(...await news.yahoo().catch(e => { logger.error(e); return []; }));
     if (!rows.length) return;
     await this.post(rows);
   }
