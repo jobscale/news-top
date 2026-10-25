@@ -6,10 +6,10 @@ import { marshall } from '@aws-sdk/util-dynamodb';
 import { logger } from '@jobscale/create-logger';
 import { formatTimestamp } from '@jobscale/timestamp';
 import { aiCalc } from './llm.js';
-import { newsFetch as rssNewsFetch } from './rss.js';
-import { newsFetch as yahooNewsFetch } from './yahoo.js';
-import { newsFetch as nikkeiNewsFetch } from './nikkei.js';
-import { newsFetch as asahiNewsFetch } from './asahi.js';
+import { newsFetch as rssNewsFetch } from './site/rss.js';
+import { newsFetch as yahooNewsFetch } from './site/yahoo.js';
+import { newsFetch as nikkeiNewsFetch } from './site/nikkei.js';
+import { newsFetch as asahiNewsFetch } from './site/asahi.js';
 
 const { ENV, XDG_SESSION_DESKTOP: DESKTOP } = process.env;
 

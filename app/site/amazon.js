@@ -1,5 +1,5 @@
 import { Agent } from 'undici';
-import { JSDOM } from 'jsdom';
+import { DOMParser } from '../dom-parser.js';
 
 const list = [
   { name: 'DICE BANK ', sale: 19000, url: 'https://www.amazon.co.jp/gp/product/B0D8VX1DT7' },
@@ -17,6 +17,7 @@ const list = [
 const userAgent = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36';
 const headers = { 'accept-language': 'ja', 'user-agent': userAgent };
 const logger = console;
+const parser = new DOMParser();
 
 class Amazon {
   fetch(input, opts = {}) {
@@ -34,7 +35,7 @@ class Amazon {
     for (const item of JSON.parse(JSON.stringify(list))) {
       await this.fetch(item.url, { headers, dispatcher })
       .then(res => res.text())
-      .then(body => new JSDOM(body).window.document)
+      .then(body => parser.parseFromString(body, 'text/html'))
       .then(document => {
         const localePrice = document.querySelector('#corePriceDisplay_desktop_feature_div .a-price-whole');
         item.price = Number.parseInt(localePrice?.textContent.replace(/[^\d.-]/g, ''), 10);

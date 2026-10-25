@@ -7,6 +7,7 @@ const mockSend = jest.fn();
 const mockParse = jest.fn();
 const mockFetch = jest.fn();
 const mockAiCalc = jest.fn();
+const mockParseFromString = jest.fn();
 
 // Mock AWS SDK
 jest.unstable_mockModule('@aws-sdk/client-dynamodb', () => ({
@@ -32,15 +33,10 @@ jest.unstable_mockModule('rss-parser', () => ({
   })),
 }));
 
-// Mock JSDOM
-jest.unstable_mockModule('jsdom', () => ({
-  JSDOM: jest.fn(() => ({
-    window: {
-      document: {
-        querySelector: jest.fn(),
-        querySelectorAll: jest.fn(() => []),
-      },
-    },
+// Mock DOMParser
+jest.unstable_mockModule('../app/dom-parser.js', () => ({
+  DOMParser: jest.fn(() => ({
+    parseFromString: mockParseFromString,
   })),
 }));
 
@@ -61,6 +57,10 @@ describe('News-Top Application Tests', () => {
     mockParse.mockReset();
     mockFetch.mockReset();
     mockAiCalc.mockReset();
+    mockParseFromString.mockReset().mockReturnValue({
+      querySelector: jest.fn(),
+      querySelectorAll: jest.fn(() => []),
+    });
   });
 
   afterEach(() => {
@@ -227,10 +227,7 @@ describe('News-Top Application Tests', () => {
           text: () => Promise.resolve('<html></html>'),
         });
 
-        const { JSDOM } = await import('jsdom');
-        JSDOM.mockImplementation(() => ({
-          window: { document: mockDocument },
-        }));
+        mockParseFromString.mockReturnValue(mockDocument);
 
         const result = await app.yahoo();
         expect(Array.isArray(result)).toBe(true);
@@ -253,10 +250,7 @@ describe('News-Top Application Tests', () => {
           text: () => Promise.resolve('<html></html>'),
         });
 
-        const { JSDOM } = await import('jsdom');
-        JSDOM.mockImplementation(() => ({
-          window: { document: mockDocument },
-        }));
+        mockParseFromString.mockReturnValue(mockDocument);
 
         const result = await app.nikkei();
         expect(Array.isArray(result)).toBe(true);

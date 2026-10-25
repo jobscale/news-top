@@ -1,5 +1,6 @@
-import { JSDOM } from 'jsdom';
+import { DOMParser } from '../dom-parser.js';
 
+const parser = new DOMParser();
 const list = [
   'https://news.yahoo.co.jp/topics',
 ];
@@ -11,7 +12,7 @@ export const newsFetch = async () => {
   for (const url of list) {
     await fetch(url, { headers })
     .then(res => res.text())
-    .then(body => new JSDOM(body).window.document)
+    .then(body => parser.parseFromString(body, 'text/html'))
     .then(document => {
       const selector = 'a:has([aria-label="NEW"])';
       const anchorList = Array.from(document.querySelectorAll(selector))

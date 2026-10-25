@@ -1,6 +1,7 @@
-import { JSDOM } from 'jsdom';
+import { DOMParser } from '../dom-parser.js';
 
 const baseUrl = 'https://www.nikkei.com';
+const parser = new DOMParser();
 const list = [
   `${baseUrl}/news/category/`,
 ];
@@ -12,7 +13,7 @@ export const newsFetch = async () => {
   for (const url of list) {
     await fetch(url, { headers })
     .then(res => res.text())
-    .then(body => new JSDOM(body).window.document)
+    .then(body => parser.parseFromString(body, 'text/html'))
     .then(document => {
       const selector = '[class^="main"] [class^="textArea"] h2 [href^="/article/"]';
       const anchorList = Array.from(document.querySelectorAll(selector))
