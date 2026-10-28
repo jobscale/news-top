@@ -4,9 +4,16 @@ Object.assign(process.env, {
   TZ: 'Asia/Tokyo',
 });
 
+const myself = {
+  [dayjs('2026-04-30 00:00:00+09:00').unix()]: '特別休暇',
+  [dayjs('2026-11-02 00:00:00+09:00').unix()]: '特別休暇',
+  [dayjs('2026-12-29 00:00:00+09:00').unix()]: '特別休暇',
+};
+
 export const getHoliday = async (now = dayjs()) => {
-  const holidays = await fetch('https://holidays-jp.github.io/api/v1/datetime.json')
+  const holidaysJp = await fetch('https://holidays-jp.github.io/api/v1/datetime.json')
   .then(res => res.json());
+  const holidays = { ...holidaysJp, ...myself };
 
   const dayAfter = [];
   for (let i = 0; i <= 10; i++) {
