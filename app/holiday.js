@@ -5,9 +5,8 @@ Object.assign(process.env, {
 });
 
 const myself = {
-  [dayjs('2026-04-30 00:00:00+09:00').unix()]: '特別休暇',
-  [dayjs('2026-11-02 00:00:00+09:00').unix()]: '特別休暇',
   [dayjs('2026-12-29 00:00:00+09:00').unix()]: '特別休暇',
+  [dayjs('2027-01-04 00:00:00+09:00').unix()]: '休日',
 };
 
 export const getHoliday = async (now = dayjs()) => {
